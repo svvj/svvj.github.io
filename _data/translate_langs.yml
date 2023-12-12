@@ -21,6 +21,6 @@
   img: https://cdn.countryflags.com/thumbs/south-korea/flag-400.png
   text: Korean
 
-- lang: ru
-  img: https://cdn.countryflags.com/thumbs/russia/flag-400.png
-  text: Russian
+# - lang: ru
+#   img: https://cdn.countryflags.com/thumbs/russia/flag-400.png
+#   text: Russian
