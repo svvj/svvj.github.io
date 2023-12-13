@@ -24,7 +24,7 @@ description              : "Seung Won's blog"
 url                      : "https://svvj.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
-teaser                   : "/assets/images/profile/profile.jpg"
+teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
 # breadcrumbs            : false # true, false (default)
@@ -105,7 +105,7 @@ analytics:
 # Site Author
 author:
   name             : "Seung Won Jeong"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  avatar           : "/assets/images/profile/profile.jpg"
   bio              : "I am an **amazing** person."
   location         : "Seoul, Republic of Korea"
   email            : wjdtmd0105@gmail.com
@@ -208,6 +208,15 @@ kramdown:
   toc_levels: 1..6
   smart_quotes: lsquo,rsquo,ldquo,rdquo
   enable_coderay: false
+
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /:collection/:path/
+  studies:
+    output: true
+    permalink: /:collection/:path/
 
 
 # Sass/SCSS
