@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment Complete</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="content-container">
+        <h2>All questions are complete!</h2>
+        <p class="complete-message">Thank you for your participation. Your responses have been recorded.</p>
+    </div>
+    <script>
+        window.onload = function () {
+            const answers = localStorage.getItem("surveyAnswers");
+            if (answers) {
+                const blob = new Blob([answers], { type: "application/json" });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "experiment_results.json";
+                a.click();
+            }
+        };
+    </script>
+</body>
+</html>

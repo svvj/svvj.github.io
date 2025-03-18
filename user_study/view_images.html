@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Viewer</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #222; /* 더 어두운 배경색 */
+            overflow: hidden; /* 화면 넘침 방지 */
+        }
+        
+        .content-container {
+            display: flex;
+            width: calc(100% - 300px); /* 오른쪽 패널 공간을 뺀 너비 */
+            height: 100vh;
+            justify-content: center; /* 수평 가운데 정렬 */
+            align-items: center; /* 수직 가운데 정렬 */
+            margin-right: 300px; /* 오른쪽 패널 너비만큼 여백 */
+        }
+        
+        .image-container {
+            flex: 4; /* 더 많은 공간 차지 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #222;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .image-container img {
+            max-width: 90%; /* 더 큰 이미지 */
+            max-height: 85vh; /* 더 큰 이미지 */
+            object-fit: contain;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .frame-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            padding: 0 30px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10; /* 앞으로 나오게 */
+        }
+        
+        .frame-slider-container {
+            width: 80%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        
+        .frame-slider {
+            width: 100%;
+            height: 12px;
+            -webkit-appearance: none;
+            background: #333;
+            outline: none;
+            border-radius: 6px;
+        }
+        
+        .frame-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .frame-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .frame-number {
+            color: white;
+            margin-left: 15px;
+            font-weight: bold;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .image-selection {
+            position: fixed; /* 고정 위치 */
+            right: 0; /* 오른쪽에 배치 */
+            top: 0;
+            bottom: 0;
+            width: 300px; /* 고정 너비 */
+            background-color: rgba(255, 255, 255, 1.0); /* 반투명 배경 */
+            box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            padding: 20px;
+            z-index: 20; /* 슬라이더보다 앞에 */
+            transition: transform 0.3s ease;
+        }
+    
+        
+        .panel-hidden .image-selection {
+            transform: translateX(300px);
+        }
+        
+
+        .image-selection h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .select-group {
+            margin-bottom: 20px;
+        }
+        
+        .image-selection label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        select {
+            padding: 10px;
+            font-size: 14px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+        
+        select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        
+        .info-panel {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+            font-size: 14px;
+        }
+        
+        .info-panel h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 6px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            width: 70px;
+            color: #555;
+        }
+        
+        .info-value {
+            color: #333;
+            word-break: break-all;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .spinner {
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 8px solid #4CAF50;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 로딩 오버레이 추가 -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div>Loading image datasets...</div>
+    </div>
+
+    <div class="content-container">
+        <div class="image-container">
+            <img id="image-frame" src="" alt="Selected Image">
+            <div class="frame-controls">
+                <div class="frame-slider-container">
+                    <input id="frame-slider" class="frame-slider" type="range" min="0" max="199" value="0">
+                </div>
+                <div class="frame-number">Frame: <span id="current-frame">0</span></div>
+            </div>
+        </div>
+    </div>
+        
+    <div class="image-selection">
+        <h2>Image Selection</h2>
+        
+        <div class="select-group">
+            <label>Rendering Method:</label>
+            <select id="render-select"></select>
+        </div>
+        
+        <div class="select-group">
+            <label>Object:</label>
+            <select id="object-select"></select>
+        </div>
+        
+        <div class="select-group">
+            <label>Number:</label>
+            <select id="num-select"></select>
+        </div>
+        
+        <div class="info-panel">
+            <h3>Image Information</h3>
+            <div class="info-item">
+                <span class="info-label">Render:</span>
+                <span class="info-value" id="info-render">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Object:</span>
+                <span class="info-value" id="info-object">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Number:</span>
+                <span class="info-value" id="info-num">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Path:</span>
+                <span class="info-value" id="info-path">-</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/view_images.js"></script>
+    <script>
+        // 프레임 번호 표시 업데이트
+        document.getElementById('frame-slider').addEventListener('input', function() {
+            document.getElementById('current-frame').textContent = this.value;
+            
+            // 정보 패널 업데이트
+            updateInfoPanel();
+        });
+        
+        // 정보 패널 업데이트 함수
+        function updateInfoPanel() {
+            const render = document.getElementById('render-select').value;
+            const object = document.getElementById('object-select').value;
+            const num = document.getElementById('num-select').value;
+            const frame = document.getElementById('frame-slider').value;
+            
+            document.getElementById('info-render').textContent = render || '-';
+            document.getElementById('info-object').textContent = object || '-';
+            document.getElementById('info-num').textContent = num || '-';
+            
+            if (render && object && num) {
+                const path = `images/${render}/${object}/N${num}M100/r_${frame}.png`;
+                document.getElementById('info-path').textContent = path;
+            } else {
+                document.getElementById('info-path').textContent = '-';
+            }
+        }
+        
+        // 선택이 변경될 때 정보 패널도 업데이트
+        document.getElementById('render-select').addEventListener('change', updateInfoPanel);
+        document.getElementById('object-select').addEventListener('change', updateInfoPanel);
+        document.getElementById('num-select').addEventListener('change', updateInfoPanel);
+    </script>
+</body>
+</html>

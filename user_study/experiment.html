@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Evaluation Study</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="experiment-container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        
+        <div class="content-area">
+            <!-- 왼쪽 이미지 -->
+            <div class="image-container">
+                <img id="image-frame" src="" alt="Study image">
+                <input type="range" id="frame-slider" min="0" max="100" value="0" oninput="updateFrame()">
+            </div>
+
+            <!-- 오른쪽 질문 - 동적으로 생성됨 -->
+            <div class="question-container">
+                <!-- 질문들이 여기에 동적으로 삽입됩니다 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 실험 완료 버튼 (초기에는 숨김) -->
+    <div class="submit-container" style="display: none;">
+        <h2>Experiment Completed</h2>
+        <p>Thank you for your participation!</p>
+        <button onclick="submitAnswers()">Submit</button>
+    </div>
+    
+    <script src="scripts/main.js"></script>
+</body>
+</html>

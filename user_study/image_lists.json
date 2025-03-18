@@ -1,0 +1,27 @@
+[
+    {
+        "render": "3dgs",
+        "object": "chair",
+        "num": "1"
+    },
+    {
+        "render": "3dgs",
+        "object": "chair",
+        "num": "2"
+    },
+    {
+        "render": "nerf",
+        "object": "chair",
+        "num": "1"
+    },
+    {
+        "render": "nerf",
+        "object": "chair",
+        "num": "2"
+    },
+    {
+        "render": "nerf",
+        "object": "drums",
+        "num": "1"
+    }
+]
