@@ -22,11 +22,6 @@
     {
         "render": "3dgs",
         "object": "chair",
-        "num": "30"
-    },
-    {
-        "render": "3dgs",
-        "object": "chair",
         "num": "50"
     },
     {
@@ -53,11 +48,6 @@
         "render": "3dgs",
         "object": "drums",
         "num": "2"
-    },
-    {
-        "render": "3dgs",
-        "object": "drums",
-        "num": "30"
     },
     {
         "render": "3dgs",
@@ -92,11 +82,6 @@
     {
         "render": "nerf",
         "object": "chair",
-        "num": "30"
-    },
-    {
-        "render": "nerf",
-        "object": "chair",
         "num": "50"
     },
     {
@@ -123,11 +108,6 @@
         "render": "nerf",
         "object": "drums",
         "num": "2"
-    },
-    {
-        "render": "nerf",
-        "object": "drums",
-        "num": "30"
     },
     {
         "render": "nerf",
