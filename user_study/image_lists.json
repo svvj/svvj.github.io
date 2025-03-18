@@ -2,7 +2,17 @@
     {
         "render": "3dgs",
         "object": "chair",
+        "num": "100"
+    },
+    {
+        "render": "3dgs",
+        "object": "chair",
         "num": "1"
+    },
+    {
+        "render": "3dgs",
+        "object": "chair",
+        "num": "20"
     },
     {
         "render": "3dgs",
@@ -10,9 +20,69 @@
         "num": "2"
     },
     {
+        "render": "3dgs",
+        "object": "chair",
+        "num": "30"
+    },
+    {
+        "render": "3dgs",
+        "object": "chair",
+        "num": "50"
+    },
+    {
+        "render": "3dgs",
+        "object": "chair",
+        "num": "70"
+    },
+    {
+        "render": "3dgs",
+        "object": "drums",
+        "num": "100"
+    },
+    {
+        "render": "3dgs",
+        "object": "drums",
+        "num": "1"
+    },
+    {
+        "render": "3dgs",
+        "object": "drums",
+        "num": "20"
+    },
+    {
+        "render": "3dgs",
+        "object": "drums",
+        "num": "2"
+    },
+    {
+        "render": "3dgs",
+        "object": "drums",
+        "num": "30"
+    },
+    {
+        "render": "3dgs",
+        "object": "drums",
+        "num": "50"
+    },
+    {
+        "render": "3dgs",
+        "object": "drums",
+        "num": "70"
+    },
+    {
+        "render": "nerf",
+        "object": "chair",
+        "num": "100"
+    },
+    {
         "render": "nerf",
         "object": "chair",
         "num": "1"
+    },
+    {
+        "render": "nerf",
+        "object": "chair",
+        "num": "20"
     },
     {
         "render": "nerf",
@@ -21,7 +91,52 @@
     },
     {
         "render": "nerf",
+        "object": "chair",
+        "num": "30"
+    },
+    {
+        "render": "nerf",
+        "object": "chair",
+        "num": "50"
+    },
+    {
+        "render": "nerf",
+        "object": "chair",
+        "num": "70"
+    },
+    {
+        "render": "nerf",
+        "object": "drums",
+        "num": "100"
+    },
+    {
+        "render": "nerf",
         "object": "drums",
         "num": "1"
+    },
+    {
+        "render": "nerf",
+        "object": "drums",
+        "num": "20"
+    },
+    {
+        "render": "nerf",
+        "object": "drums",
+        "num": "2"
+    },
+    {
+        "render": "nerf",
+        "object": "drums",
+        "num": "30"
+    },
+    {
+        "render": "nerf",
+        "object": "drums",
+        "num": "50"
+    },
+    {
+        "render": "nerf",
+        "object": "drums",
+        "num": "70"
     }
 ]

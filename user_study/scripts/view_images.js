@@ -16,67 +16,199 @@ let cacheTTL = 1 * 60 * 1000; // 캐시 유효 시간 5분
 
 // 이미지 데이터 로드
 document.addEventListener('DOMContentLoaded', function() {
-    // 로딩 오버레이 표시
+    const renderSelect = document.getElementById('render-select');
+    const objectSelect = document.getElementById('object-select');
+    const numSelect = document.getElementById('num-select');
+    const frameSlider = document.getElementById('frame-slider');
+    const currentFrameSpan = document.getElementById('current-frame');
+    const imageFrame = document.getElementById('image-frame');
     const loadingOverlay = document.getElementById('loading-overlay');
-    
-    // 타임스탬프를 추가하여 image_lists.json은 항상 최신 버전을 로드
-    const timestamp = new Date().getTime();
-    fetch(`image_lists.json?t=${timestamp}`)
+
+    // 정보 패널 요소
+    const infoRender = document.getElementById('info-render');
+    const infoObject = document.getElementById('info-object');
+    const infoNum = document.getElementById('info-num');
+    const infoPath = document.getElementById('info-path');
+
+    // 현재 선택된 값들을 저장
+    let currentRender = '';
+    let currentObject = '';
+    let currentNum = '';
+
+    let imageData = [];
+
+    // JSON 데이터 로드
+    fetch('image_lists.json')
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                throw new Error('Network response was not ok');
             }
             return response.json();
         })
         .then(data => {
-            if (!data || data.length === 0) {
-                throw new Error("Images data is empty or invalid");
-            }
-            
-            console.log("Successfully loaded images.json:", data);
             imageData = data;
             
-            // 렌더링 방법, 오브젝트, 번호 추출
-            processImageData();
+            // 중복 제거하여 렌더링 방법 옵션 추출
+            const renders = [...new Set(imageData.map(item => item.render))];
             
-            // 선택기 채우기
-            populateSelectors();
+            // Rendering Method 옵션 로드
+            renderSelect.innerHTML = ''; // 기존 옵션 제거
+            renders.forEach(render => {
+                const option = document.createElement('option');
+                option.value = render;
+                option.textContent = render;
+                renderSelect.appendChild(option);
+            });
+
+            // 첫 번째 렌더링 방법 선택
+            currentRender = renders[0];
+            renderSelect.value = currentRender;
             
-            // 초기값 명시적으로 설정하고 이미지 로드 (중요!)
-            if (renders.length > 0) {
-                const renderSelect = document.getElementById('render-select');
-                renderSelect.value = currentRender;
-                
-                // 객체와 번호 선택자 업데이트
-                updateObjectSelector();
-                updateNumberSelector();
-                
-                // 초기 이미지 로드
-                loadCurrentImage(true);
-                
-                // 정보 패널 업데이트
-                updateInfoPanel();
-            }
+            // 객체 옵션 업데이트 (초기 로드이므로 선택값 유지 필요 없음)
+            updateObjectOptions(false);
+            
+            // 초기 이미지 로드
+            loadImage();
             
             // 로딩 오버레이 숨기기
             loadingOverlay.style.display = 'none';
         })
         .catch(error => {
-            console.error("Error loading images.json:", error);
-            alert(`Failed to load image data: ${error.message}. Please refresh the page and try again.`);
-            // 에러 발생시에도 로딩 오버레이 숨기기
-            loadingOverlay.style.display = 'none';
+            console.error('Error loading image data:', error);
+            loadingOverlay.innerHTML = `<div>Error loading data: ${error.message}</div>`;
         });
-    
-    // 프레임 슬라이더 변경 이벤트
-    document.getElementById('frame-slider').addEventListener('input', function() {
-        // 프레임 번호 표시 업데이트
-        document.getElementById('current-frame').textContent = this.value;
-        updateFrame();
+
+    // 렌더링 방법 변경 시 객체 옵션 업데이트 (선택값 유지)
+    renderSelect.addEventListener('change', function() {
+        currentRender = this.value;
+        // true를 전달하여 선택값 유지
+        updateObjectOptions(true);
     });
     
-    // 새로고침 버튼 추가
-    addRefreshButton();
+    // 객체 변경 시 Number 옵션 업데이트 (선택값 유지)
+    objectSelect.addEventListener('change', function() {
+        currentObject = this.value;
+        // true를 전달하여 선택값 유지
+        updateNumberOptions(true);
+    });
+    
+    // 프레임 슬라이더 변경 시
+    frameSlider.addEventListener('input', function() {
+        currentFrameSpan.textContent = this.value;
+        loadImage();
+    });
+    
+    // Number 선택 변경 시
+    numSelect.addEventListener('change', function() {
+        currentNum = this.value;
+        loadImage();
+    });
+    
+    // 객체 옵션 업데이트 함수
+    function updateObjectOptions(keepSelection) {
+        const render = renderSelect.value;
+        
+        // 선택된 렌더링 방법에 해당하는 객체만 필터링
+        const filteredData = imageData.filter(item => item.render === render);
+        
+        // 중복 제거하여 객체 옵션 추출
+        const objects = [...new Set(filteredData.map(item => item.object))];
+        
+        // 현재 선택된 객체 저장 (있을 경우)
+        const previousObjectSelection = keepSelection ? currentObject : null;
+        
+        // 객체 옵션 로드
+        objectSelect.innerHTML = ''; // 기존 옵션 제거
+        objects.forEach(object => {
+            const option = document.createElement('option');
+            option.value = object;
+            option.textContent = object;
+            objectSelect.appendChild(option);
+        });
+        
+        // 이전에 선택된 객체가 있고 새 목록에도 있으면 유지
+        if (previousObjectSelection && objects.includes(previousObjectSelection)) {
+            objectSelect.value = previousObjectSelection;
+            currentObject = previousObjectSelection;
+        } else {
+            // 아니면 첫 번째 객체 선택
+            currentObject = objects[0];
+            objectSelect.value = currentObject;
+        }
+        
+        // Number 옵션 업데이트
+        updateNumberOptions(keepSelection);
+    }
+    
+    // Number 옵션 업데이트 함수
+    function updateNumberOptions(keepSelection) {
+        const render = renderSelect.value;
+        const object = objectSelect.value;
+        
+        // 선택된 렌더링 방법과 객체에 해당하는 Number만 필터링
+        const filteredData = imageData.filter(
+            item => item.render === render && item.object === object
+        );
+        
+        // Number 값 추출
+        const numbers = filteredData.map(item => item.num);
+        
+        // Number를 숫자로 변환하여 정렬 후 다시 문자열로 변환
+        const sortedNumbers = [...numbers].sort((a, b) => parseInt(a) - parseInt(b));
+        
+        // 현재 선택된 Number 저장 (있을 경우)
+        const previousNumSelection = keepSelection ? currentNum : null;
+        
+        // Number 옵션 로드
+        numSelect.innerHTML = ''; // 기존 옵션 제거
+        sortedNumbers.forEach(num => {
+            const option = document.createElement('option');
+            option.value = num;
+            option.textContent = num;
+            numSelect.appendChild(option);
+        });
+        
+        // 이전에 선택된 Number가 있고 새 목록에도 있으면 유지
+        if (previousNumSelection && sortedNumbers.includes(previousNumSelection)) {
+            numSelect.value = previousNumSelection;
+            currentNum = previousNumSelection;
+        } else {
+            // 아니면 첫 번째 Number 선택
+            currentNum = sortedNumbers[0];
+            numSelect.value = currentNum;
+        }
+        
+        // 이미지 다시 로드
+        loadImage();
+    }
+    
+    // 이미지 로드 함수
+    function loadImage() {
+        const render = renderSelect.value;
+        const object = objectSelect.value;
+        const num = numSelect.value;
+        const frame = frameSlider.value;
+        
+        // 정보 패널 업데이트
+        infoRender.textContent = render || '-';
+        infoObject.textContent = object || '-';
+        infoNum.textContent = num || '-';
+        
+        if (render && object && num) {
+            const path = `images/${render}/${object}/N${num}M100/r_${frame}.png`;
+            infoPath.textContent = path;
+            imageFrame.src = path;
+            
+            // 이미지 로드 오류 처리
+            imageFrame.onerror = function() {
+                console.error(`Failed to load image: ${path}`);
+                imageFrame.src = 'images/error.png'; // 에러 이미지로 대체
+            };
+        } else {
+            infoPath.textContent = '-';
+            imageFrame.src = '';
+        }
+    }
 });
 
 // 캐시 관리 함수

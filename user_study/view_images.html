@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Viewer</title>
-    <link rel="stylesheet" href="styles/main.css">
+    <title>View Images</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
         body {
             margin: 0;
@@ -32,18 +32,20 @@
             background-color: #222;
             position: relative;
             overflow: hidden;
+            padding-bottom: 80px; /* 슬라이더를 위한 공간 추가 */
         }
         
         .image-container img {
             max-width: 90%; /* 더 큰 이미지 */
-            max-height: 85vh; /* 더 큰 이미지 */
+            max-height: 80vh; /* 이미지 높이를 조금 줄임 */
             object-fit: contain;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            margin-top: -40px; /* 이미지를 위로 올림 */
         }
         
         .frame-controls {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px; /* 더 아래로 내림 */
             left: 0;
             width: 100%;
             padding: 0 30px;
@@ -242,36 +244,45 @@
         
         <div class="select-group">
             <label>Rendering Method:</label>
-            <select id="render-select"></select>
+            <select id="render-select">
+                <option value="3dgs">3dgs</option>
+                <!-- Add other options here -->
+            </select>
         </div>
         
         <div class="select-group">
             <label>Object:</label>
-            <select id="object-select"></select>
+            <select id="object-select">
+                <option value="chair">chair</option>
+                <!-- Add other options here -->
+            </select>
         </div>
         
         <div class="select-group">
             <label>Number:</label>
-            <select id="num-select"></select>
+            <select id="num-select">
+                <option value="1">1</option>
+                <!-- Add other options here -->
+            </select>
         </div>
         
         <div class="info-panel">
             <h3>Image Information</h3>
             <div class="info-item">
                 <span class="info-label">Render:</span>
-                <span class="info-value" id="info-render">-</span>
+                <span class="info-value" id="info-render">3dgs</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Object:</span>
-                <span class="info-value" id="info-object">-</span>
+                <span class="info-value" id="info-object">chair</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Number:</span>
-                <span class="info-value" id="info-num">-</span>
+                <span class="info-value" id="info-num">1</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Path:</span>
-                <span class="info-value" id="info-path">-</span>
+                <span class="info-value" id="info-path">images/3dgs/chair/N1M100/r_0.png</span>
             </div>
         </div>
     </div>

@@ -12,8 +12,13 @@ for obj in objects:
     else:
         print("Processing", obj)
     # N{num}M{T_out}
-    for num in range(1, 3):
+    for num in range(1, 101):
         img_path = os.path.join(obj_path, f"N{num}M{T_out}")
+        if not os.path.exists(img_path):
+            print(img_path, "does not exist")
+            continue
+        else:
+            print("Processing", img_path)
         for img in os.listdir(img_path):
             if img.endswith(".png"):
                 if img.startswith("r_"):
