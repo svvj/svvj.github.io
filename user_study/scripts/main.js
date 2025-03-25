@@ -78,7 +78,6 @@ function generateQuestions() {
 
     // 각 이미지에 대해 3개의 질문 생성
     imageSequence.forEach((img, imgIndex) => {
-        // 질문 1: 사실감
         const question1 = {
             render: img.render,
             object: img.object,
@@ -91,7 +90,7 @@ function generateQuestions() {
             imageIndex: imgIndex
         };
         
-        // 질문 2: 선명도
+        // 질문 2: 선명도 (라이커트 스케일)
         const question2 = {
             render: img.render,
             object: img.object,
@@ -103,24 +102,44 @@ function generateQuestions() {
             labels: ["Not clear at all", "Extremely clear"],
             imageIndex: imgIndex
         };
-        
-        // 질문 3: 세부 표현
+        // 질문 4: 다중 선택 (체크박스)
         const question3 = {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "How detailed is this image?",
+            question: "Which aspects of this image look most realistic? (Select all that apply)",
+            required: false,
+            type: "checkbox",
+            options: [
+                "Lighting", 
+                "Textures", 
+                "Shapes", 
+                "Colors", 
+                "Shadows", 
+                "None of the above"
+            ],
+            imageIndex: imgIndex
+        };
+        // 새로운 선택형 질문 추가
+        const question4 = {
+            render: img.render,
+            object: img.object,
+            num: img.num,
+            question: "Which best describes the object in this image?",
             required: true,
-            type: "likert",
-            scale: 7,
-            labels: ["Not detailed at all", "Extremely detailed"],
+            type: "multiplechoice",  // 새로운 타입
+            options: [               // 선택 옵션
+                "Very unrealistic",
+                "Somewhat unrealistic", 
+                "Neutral", 
+                "Somewhat realistic", 
+                "Very realistic"
+            ],
             imageIndex: imgIndex
         };
         
         // 세 개의 질문을 모두 추가
-        [question1, question2, question3].forEach(q => {
-            const likertElement = createLikertQuestion(q, questionList.length);
-            questionContainer.appendChild(likertElement);
+        [question1, question2, question3, question4].forEach(q => {
             questionList.push(q);
         });
     });
@@ -144,6 +163,7 @@ function initializeExperiment() {
 // **현재 질문 업데이트 함수** - 이전 답변 복원 로직 추가
 function updateQuestion() {
     const questionContainer = document.querySelector(".question-container");
+    
     if (!questionContainer) {
         console.error("Question container not found");
         return;
@@ -153,69 +173,49 @@ function updateQuestion() {
     questionContainer.innerHTML = "";
 
     if (currentQuestionIndex >= questionList.length) {
-        // 모든 질문이 끝났을 때
         showSubmitButton();
         return;
     }
 
     // 현재 질문 데이터
     const questionData = questionList[currentQuestionIndex];
-
-    // 여기가 핵심: type이 likert일 경우 createLikertQuestion 함수를 사용
-    if (questionData.type === "likert") {
-        // 기존 createLikertQuestion 함수 사용 (버튼은 함수 내에서 추가됨)
-        const likertElement = createLikertQuestion(questionData, currentQuestionIndex);
-        
-        // 네비게이션 버튼은 createLikertQuestion 내에서 이미 추가되므로 여기서는 추가하지 않음
-        
-        // 질문 컨테이너에 추가
-        questionContainer.appendChild(likertElement);
-        
-        // 저장된 답변이 있으면 복원
-        restoreSavedAnswer();
-        
-        // 진행률 표시줄 업데이트
-        updateProgressBar();
-        return;
+    let questionElement;
+    
+    // 질문 유형에 따라 적절한 UI 생성
+    switch(questionData.type) {
+        case "likert":
+            questionElement = createLikertQuestion(questionData, currentQuestionIndex);
+            break;
+        case "multiplechoice":
+            questionElement = createMultipleChoiceQuestion(questionData, currentQuestionIndex);
+            break;
+        case "checkbox":
+            questionElement = createCheckboxQuestion(questionData, currentQuestionIndex);
+            break;
+        default:
+            console.warn(`Unknown question type: ${questionData.type}`);
+            return;
     }
     
-    // 텍스트 질문 등 다른 타입의 질문에 대한 기존 처리 유지
-    const questionElement = document.createElement("div");
-    questionElement.classList.add("question", "active");
-    questionElement.setAttribute("data-question", `q${currentQuestionIndex}`);
-
-    // 질문 제목
-    const questionHeader = `
-        <label>${questionData.question} 
-            ${questionData.required ? "<span style='color:red;'>* Required</span>" : ""}
-        </label><br>
-    `;
-
-    // 질문 유형에 따른 입력 필드 생성
-    let inputField = "";
-
-    if (questionData.type === "text") {
-        inputField = `<textarea ${questionData.required ? "required" : ""}></textarea>`;
+    // 질문 요소 추가
+    if (questionElement) {
+        questionContainer.appendChild(questionElement);
     }
-    // likert 타입은 위에서 처리했으므로 여기서는 필요 없음
-
-    // 네비게이션 버튼
-    const navigationButtons = `
-        <div class="navigation-buttons">
-            ${currentQuestionIndex > 0 ? '<button onclick="prevQuestion()">Previous</button>' : ''}
-            <button onclick="nextQuestion()">Next</button>
-        </div>
-    `;
-
-    // 전체 질문 요소 구성
-    questionElement.innerHTML = questionHeader + inputField + navigationButtons;
-    questionContainer.appendChild(questionElement);
-
-    // 저장된 답변이 있으면 복원
+    
+    // 이미지 관련 처리
+    updateImageForQuestion(questionData);
+    
+    // 저장된 답변 복원
     restoreSavedAnswer();
-
-    // 진행률 표시줄 업데이트
+    
+    // 진행률 표시 업데이트
     updateProgressBar();
+}
+
+// 질문에 맞는 이미지 및 레퍼런스 업데이트
+function updateImageForQuestion(questionData) {
+    // 이미지 관련 요소 업데이트 로직
+    // 필요시 구현
 }
 
 
@@ -504,34 +504,46 @@ function preloadAdjacentFrames(render, object, num, currentFrame) {
     });
 }
 
-// **필수 질문 확인 함수**
+// 필수 항목 검증
 function validateRequiredQuestions() {
     if (currentQuestionIndex >= questionList.length) {
-        return true; // 이미 모든 질문이 끝났으면 true
+        return true;
     }
     
     const questionData = questionList[currentQuestionIndex];
     
     if (questionData.required) {
         const activeQuestion = document.querySelector(".question.active");
-        if (!activeQuestion) {
-            console.error("Active question element not found");
-            return false;
-        }
+        if (!activeQuestion) return false;
         
-        if (questionData.type === "text") {
-            const textarea = activeQuestion.querySelector("textarea");
-            if (!textarea || textarea.value.trim() === "") {
-                alert("Please answer the required text question before proceeding.");
-                return false;
-            }
-        } 
-        else if (questionData.type === "likert") {
-            const checked = activeQuestion.querySelector(`input[name="q${currentQuestionIndex}"]:checked`);
-            if (!checked) {
-                alert("Please select an option for the required question.");
-                return false;
-            }
+        switch(questionData.type) {
+            case "likert":
+            case "multiplechoice":
+                // 라디오 버튼 검증
+                const checked = activeQuestion.querySelector(`input[name="q${currentQuestionIndex}"]:checked`);
+                if (!checked) {
+                    alert("Please select an option for the required question before continuing.");
+                    return false;
+                }
+                break;
+            
+            case "checkbox":
+                // 체크박스 검증 - 적어도 하나는 선택되어 있어야 함
+                if (questionData.required) {
+                    let anyChecked = false;
+                    questionData.options.forEach((_, optIndex) => {
+                        const checkbox = activeQuestion.querySelector(`input[name="q${currentQuestionIndex}_opt${optIndex}"]`);
+                        if (checkbox && checkbox.checked) {
+                            anyChecked = true;
+                        }
+                    });
+                    
+                    if (!anyChecked) {
+                        alert("Please select at least one option for the required question before continuing.");
+                        return false;
+                    }
+                }
+                break;
         }
     }
     
@@ -599,68 +611,123 @@ function nextQuestion() {
     }
 }
 
-// **현재 질문 응답 저장**
+// 답변 저장 함수 수정
+// 답변 저장 함수 수정
 function saveCurrentAnswer() {
     const timeSpent = Date.now() - startTime;
     const activeQuestion = document.querySelector(".question.active");
-    const questionData = questionList[currentQuestionIndex];
     
     if (!activeQuestion) return;
     
-    let value = "";
+    const questionData = questionList[currentQuestionIndex];
+    let value;
+    let explanationText = null;
     
-    if (questionData.type === "text") {
-        const textarea = activeQuestion.querySelector("textarea");
-        if (textarea) {
-            value = textarea.value;
-        }
-    } 
-    else if (questionData.type === "likert") {
-        const checked = activeQuestion.querySelector(`input[name="q${currentQuestionIndex}"]:checked`);
-        if (checked) {
-            value = checked.value;
-        }
+    switch(questionData.type) {
+        case "likert":
+        case "multiplechoice":
+            // 라디오 버튼 처리
+            const checked = activeQuestion.querySelector(`input[name="q${currentQuestionIndex}"]:checked`);
+            value = checked ? checked.value : "";
+            break;
+        
+        case "checkbox":
+            // 체크박스 처리 - 선택된 모든 값을 배열로 저장
+            value = [];
+            questionData.options.forEach((option, optIndex) => {
+                const checkbox = activeQuestion.querySelector(`input[name="q${currentQuestionIndex}_opt${optIndex}"]`);
+                if (checkbox && checkbox.checked) {
+                    value.push(checkbox.value);
+                    
+                    // "None of the above" 인 경우 설명 텍스트도 저장
+                    if (option === "None of the above") {
+                        const textarea = activeQuestion.querySelector(`#q${currentQuestionIndex}_none_explanation`);
+                        if (textarea) {
+                            explanationText = textarea.value;
+                        }
+                    }
+                }
+            });
+            break;
     }
     
+    // 답변 저장
     answers[`q${currentQuestionIndex}`] = {
         render: questionData.render,
         object: questionData.object,
         num: questionData.num,
         question: questionData.question,
         value: value,
-        timeSpent: timeSpent
+        timeSpent: timeSpent,
+        explanation: explanationText // 추가 설명 저장
     };
 }
 
-// **저장된 답변 복원 함수**
+// 저장된 답변 복원
 function restoreSavedAnswer() {
     const questionKey = `q${currentQuestionIndex}`;
     const savedAnswer = answers[questionKey];
     
-    if (!savedAnswer) return; // 저장된 답변이 없으면 리턴
+    if (!savedAnswer) return;
     
     const activeQuestion = document.querySelector(".question.active");
     if (!activeQuestion) return;
     
     const questionData = questionList[currentQuestionIndex];
     
-    // 질문 유형에 따라 다르게 처리
-    if (questionData.type === "text") {
-        const textarea = activeQuestion.querySelector("textarea");
-        if (textarea && savedAnswer.value) {
-            textarea.value = savedAnswer.value;
-        }
-    } 
-    else if (questionData.type === "likert") {
-        const radioButtons = activeQuestion.querySelectorAll(`input[name="q${currentQuestionIndex}"]`);
-        if (radioButtons.length > 0 && savedAnswer.value) {
-            // 저장된 값과 일치하는 라디오 버튼 찾기
-            radioButtons.forEach(radio => {
-                if (radio.value === savedAnswer.value) {
-                    radio.checked = true;
-                }
-            });
-        }
+    switch(questionData.type) {
+        case "likert":
+        case "multiplechoice":
+            // 라디오 버튼 복원
+            if (savedAnswer.value) {
+                const radioButtons = activeQuestion.querySelectorAll(`input[name="q${currentQuestionIndex}"]`);
+                radioButtons.forEach(radio => {
+                    if (radio.value === savedAnswer.value) {
+                        radio.checked = true;
+                    }
+                });
+            }
+            break;
+        
+        case "checkbox":
+            // 체크박스 복원
+            if (Array.isArray(savedAnswer.value)) {
+                let hasNoneOfAbove = false;
+                
+                questionData.options.forEach((option, optIndex) => {
+                    const checkbox = activeQuestion.querySelector(`input[name="q${currentQuestionIndex}_opt${optIndex}"]`);
+                    if (checkbox) {
+                        const isChecked = savedAnswer.value.includes(checkbox.value);
+                        checkbox.checked = isChecked;
+                        
+                        // "None of the above" 처리
+                        if (option === "None of the above" && isChecked) {
+                            hasNoneOfAbove = true;
+                            
+                            // 텍스트 영역 표시
+                            const textareaContainer = activeQuestion.querySelector(`.none-explanation-container`);
+                            if (textareaContainer) {
+                                textareaContainer.style.display = "block";
+                            }
+                            
+                            // 저장된 텍스트 복원
+                            const textarea = activeQuestion.querySelector(`#q${currentQuestionIndex}_none_explanation`);
+                            if (textarea && savedAnswer.explanation) {
+                                textarea.value = savedAnswer.explanation;
+                            }
+                        }
+                    }
+                });
+            }
+            break;
+            
+        case "text":
+            // 텍스트 복원
+            const textarea = activeQuestion.querySelector("textarea");
+            if (textarea && savedAnswer.value) {
+                textarea.value = savedAnswer.value;
+            }
+            break;
     }
 }
 
@@ -1137,6 +1204,183 @@ function createLikertQuestion(question, index) {
     const buttonContainer = document.createElement("div");
     buttonContainer.style.display = "flex";
     buttonContainer.style.justifyContent = "space-between"; // 양쪽 정렬
+    buttonContainer.style.marginTop = "20px";
+    
+    // 왼쪽 영역 (Previous 버튼용)
+    const leftButtonArea = document.createElement("div");
+    
+    // 오른쪽 영역 (Next 버튼용)
+    const rightButtonArea = document.createElement("div");
+    
+    // 이전 버튼 (첫 번째 질문이 아닐 경우에만)
+    if (index > 0) {
+        const prevButton = document.createElement("button");
+        prevButton.textContent = "Previous";
+        prevButton.onclick = function() { prevQuestion(); };
+        leftButtonArea.appendChild(prevButton);
+    }
+    
+    // 다음 버튼 (항상 오른쪽)
+    const nextButton = document.createElement("button");
+    nextButton.textContent = "Next";
+    nextButton.onclick = function() { nextQuestion(); };
+    rightButtonArea.appendChild(nextButton);
+    
+    // 버튼 영역 추가
+    buttonContainer.appendChild(leftButtonArea);
+    buttonContainer.appendChild(rightButtonArea);
+    questionElement.appendChild(buttonContainer);
+    
+    return questionElement;
+}
+
+function createMultipleChoiceQuestion(question, index) {
+    // 질문 컨테이너
+    const questionElement = document.createElement("div");
+    questionElement.className = "question active";
+    questionElement.setAttribute("data-index", index);
+
+    // 질문 제목
+    const title = document.createElement("h2");
+    title.innerHTML = `${question.question} 
+                      ${question.required ? "<span style='color:red;'>*</span>" : ""}`;
+    questionElement.appendChild(title);
+
+    // 옵션 컨테이너
+    const optionsContainer = document.createElement("div");
+    optionsContainer.className = "options-container";
+    
+    // 옵션 추가
+    question.options.forEach((option, optIndex) => {
+        const optionDiv = document.createElement("div");
+        optionDiv.className = "option";
+        
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = `q${index}`;
+        radio.value = option.value || option;
+        radio.id = `q${index}_opt${optIndex}`;
+        if (question.required) radio.required = true;
+        
+        const label = document.createElement("label");
+        label.htmlFor = `q${index}_opt${optIndex}`;
+        label.textContent = option.label || option;
+        
+        optionDiv.appendChild(radio);
+        optionDiv.appendChild(label);
+        optionsContainer.appendChild(optionDiv);
+    });
+    
+    questionElement.appendChild(optionsContainer);
+    
+    // 버튼 컨테이너 생성 (flex 레이아웃 사용)
+    const buttonContainer = document.createElement("div");
+    buttonContainer.style.display = "flex";
+    buttonContainer.style.justifyContent = "space-between";
+    buttonContainer.style.marginTop = "20px";
+    
+    // 왼쪽 영역 (Previous 버튼용)
+    const leftButtonArea = document.createElement("div");
+    
+    // 오른쪽 영역 (Next 버튼용)
+    const rightButtonArea = document.createElement("div");
+    
+    // 이전 버튼 (첫 번째 질문이 아닐 경우에만)
+    if (index > 0) {
+        const prevButton = document.createElement("button");
+        prevButton.textContent = "Previous";
+        prevButton.onclick = function() { prevQuestion(); };
+        leftButtonArea.appendChild(prevButton);
+    }
+    
+    // 다음 버튼 (항상 오른쪽)
+    const nextButton = document.createElement("button");
+    nextButton.textContent = "Next";
+    nextButton.onclick = function() { nextQuestion(); };
+    rightButtonArea.appendChild(nextButton);
+    
+    // 버튼 영역 추가
+    buttonContainer.appendChild(leftButtonArea);
+    buttonContainer.appendChild(rightButtonArea);
+    questionElement.appendChild(buttonContainer);
+    
+    return questionElement;
+}
+
+// 체크박스 질문 생성 (여러 옵션 선택 가능)
+function createCheckboxQuestion(question, index) {
+    // 질문 컨테이너
+    const questionElement = document.createElement("div");
+    questionElement.className = "question active";
+    questionElement.setAttribute("data-index", index);
+
+    // 질문 제목
+    const title = document.createElement("h2");
+    title.innerHTML = `${question.question} 
+                      ${question.required ? "<span style='color:red;'>*</span>" : ""}`;
+    questionElement.appendChild(title);
+
+    // 옵션 컨테이너
+    const optionsContainer = document.createElement("div");
+    optionsContainer.className = "checkbox-container";
+    optionsContainer.style.display = "flex";
+    optionsContainer.style.flexDirection = "column";
+    optionsContainer.style.gap = "10px";
+    
+    // 옵션 추가
+    question.options.forEach((option, optIndex) => {
+        const optionDiv = document.createElement("div");
+        optionDiv.className = "checkbox-option";
+        
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = `q${index}_opt${optIndex}`;
+        checkbox.value = option.value || option;
+        checkbox.id = `q${index}_opt${optIndex}`;
+        
+        const label = document.createElement("label");
+        label.htmlFor = `q${index}_opt${optIndex}`;
+        label.textContent = option.label || option;
+        
+        optionDiv.appendChild(checkbox);
+        optionDiv.appendChild(label);
+        optionsContainer.appendChild(optionDiv);
+        
+        // "None of the above" 옵션에 이벤트 리스너 추가
+        if (option === "None of the above") {
+            // 텍스트 입력 영역 생성 (초기에는 숨김)
+            const textareaContainer = document.createElement("div");
+            textareaContainer.className = "none-explanation-container";
+            textareaContainer.style.marginTop = "10px";
+            textareaContainer.style.marginLeft = "25px";
+            textareaContainer.style.display = "none";
+            
+            const textarea = document.createElement("textarea");
+            textarea.id = `q${index}_none_explanation`;
+            textarea.name = `q${index}_none_explanation`;
+            textarea.placeholder = "Please explain why none of the aspects look realistic...";
+            textarea.style.width = "100%";
+            textarea.style.minHeight = "80px";
+            textarea.style.padding = "8px";
+            textarea.style.borderRadius = "4px";
+            textarea.style.border = "1px solid #ccc";
+            
+            textareaContainer.appendChild(textarea);
+            optionDiv.appendChild(textareaContainer);
+            
+            // 체크박스 이벤트 리스너
+            checkbox.addEventListener("change", function() {
+                textareaContainer.style.display = this.checked ? "block" : "none";
+            });
+        }
+    });
+    
+    questionElement.appendChild(optionsContainer);
+    
+    // 버튼 컨테이너
+    const buttonContainer = document.createElement("div");
+    buttonContainer.style.display = "flex";
+    buttonContainer.style.justifyContent = "space-between";
     buttonContainer.style.marginTop = "20px";
     
     // 왼쪽 영역 (Previous 버튼용)
