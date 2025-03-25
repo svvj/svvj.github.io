@@ -14,15 +14,25 @@
         </div>
         
         <div class="content-area">
-            <!-- 왼쪽 이미지 -->
-            <div class="image-container">
-                <img id="image-frame" src="" alt="Study image">
-                <input type="range" id="frame-slider" min="0" max="100" value="0" oninput="updateFrame()">
+            <!-- 왼쪽 레퍼런스 이미지 섹션 -->
+            <div class="reference-container" id="reference-container">
+                <!-- 레퍼런스 이미지 썸네일들이 동적으로 추가됩니다 -->
             </div>
 
-            <!-- 오른쪽 질문 - 동적으로 생성됨 -->
+            <!-- 중앙 메인 이미지 섹션 -->
+            <div class="image-container">
+                <div class="image-wrapper">
+                    <img id="image-frame" src="" alt="Main Image">
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="frame-slider" min="0" max="199" value="0" oninput="updateFrame()">
+                    <div class="frame-info">Frame: <span id="current-frame">1</span>/200</div>
+                </div>
+            </div>
+
+            <!-- 오른쪽 질문 섹션 -->
             <div class="question-container">
-                <!-- 질문들이 여기에 동적으로 삽입됩니다 -->
+                <!-- 질문들이 동적으로 추가됩니다 -->
             </div>
         </div>
     </div>

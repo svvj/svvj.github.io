@@ -1,0 +1,25 @@
+{
+    "questions": [
+      {
+        "type": "likert",
+        "question": "How realistic does this image look?",
+        "required": true,
+        "scale": 7,
+        "labels": ["Not realistic at all", "Extremely realistic"]
+      },
+      {
+        "type": "likert",
+        "question": "How clear is this image?",
+        "required": true,
+        "scale": 7,
+        "labels": ["Not clear at all", "Extremely clear"]
+      },
+      {
+        "type": "likert",
+        "question": "How detailed is this image?",
+        "required": true,
+        "scale": 7,
+        "labels": ["Not detailed at all", "Extremely detailed"]
+      }
+    ]
+  }
