@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Experiment</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .instruction-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .note {
+            background-color: #f8f8f8;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .start-button {
+            padding: 12px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .start-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="instruction-container">
+        <h1>본 실험 시작</h1>
+        
+        <p>이제부터 본 실험을 시작합니다. 연습 세션에서 익숙해지셨던 것처럼 다양한 렌더링 결과물의 품질을 평가해 주세요.</p>
+        
+        <div class="note">
+            <h3>중요 안내사항:</h3>
+            <ul>
+                <li>총 약 40개의 이미지를 평가하게 됩니다.</li>
+                <li>진행 중에 저장 버튼을 통해 현재까지의 응답을 저장할 수 있습니다.</li>
+                <li>실험이 끝나면 모든 응답 데이터가 파일로 저장됩니다.</li>
+                <li>충분한 시간을 가지고 신중하게 평가해 주세요.</li>
+            </ul>
+        </div>
+        
+        <p>준비가 되셨다면 아래 버튼을 클릭하여 본 실험을 시작해 주세요.</p>
+        
+        <div class="button-container">
+            <button class="start-button" onclick="window.location.href='experiment.html'">본 실험 시작하기</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment Instructions</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .instruction-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .instruction-image {
+            max-width: 100%;
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .start-button {
+            padding: 12px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .start-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="instruction-container">
+        <h1>실험 안내</h1>
+        
+        <h2>실험의 목적</h2>
+        <p>본 실험은 다양한 3D 렌더링 기법으로 생성된 이미지의 품질을 평가하는 것입니다. 여러분의 의견은 더 나은 렌더링 알고리즘 개발에 중요한 정보가 될 것입니다.</p>
+        
+        <h2>실험 방법</h2>
+        <p>각 화면에서는 다음과 같은 요소들을 볼 수 있습니다:</p>
+        <ul>
+            <li><strong>왼쪽:</strong> 레퍼런스 이미지 - 실제 물체의 참조 이미지입니다.</li>
+            <li><strong>중앙:</strong> 평가할 렌더링 이미지 - 슬라이더를 움직여 프레임을 변경할 수 있습니다.</li>
+            <li><strong>오른쪽:</strong> 질문 - 각 렌더링 이미지에 대한 품질 평가 질문에 답해주세요.</li>
+        </ul>
+        
+        <p>먼저 짧은 연습 세션을 통해 인터페이스에 익숙해진 후, 실제 실험을 진행하게 됩니다.</p>
+        
+        <h2>시작하기 전에</h2>
+        <p>실험은 약 20-30분 정도 소요됩니다. 중간에 페이지를 벗어나야 할 경우, '저장' 버튼을 눌러 진행 상황을 저장할 수 있습니다.</p>
+        
+        <div class="button-container">
+            <button class="start-button" onclick="window.location.href='experiment_test.html'">연습 시작하기</button>
+        </div>
+    </div>
+</body>
+</html>

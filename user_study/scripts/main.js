@@ -4,6 +4,7 @@ let startTime;
 let questionList = [];
 let imageSequence = [];
 
+
 const imageCache = {
     renderingImages: new Map(), // 렌더링 이미지 캐시
     referenceImages: new Map(), // 레퍼런스 이미지 캐시
@@ -102,17 +103,17 @@ function generateQuestions() {
             labels: ["Not Consistent", "Very Consistent"],
             imageIndex: imgIndex
         };
-        const question3 = {
-            render: img.render,
-            object: img.object,
-            num: img.num,
-            question: "How realistic does the reconstructed 3D object look to you?",
-            required: true,
-            type: "likert",
-            scale: 5,
-            labels: ["Not Realistic", "Very Realistic"],
-            imageIndex: imgIndex
-        };
+        // const question3 = {
+        //     render: img.render,
+        //     object: img.object,
+        //     num: img.num,
+        //     question: "How realistic does the reconstructed 3D object look to you?",
+        //     required: true,
+        //     type: "likert",
+        //     scale: 5,
+        //     labels: ["Not Realistic", "Very Realistic"],
+        //     imageIndex: imgIndex
+        // };
         // // 질문 4: 다중 선택 (체크박스)
         // const question3 = {
         //     render: img.render,
@@ -150,7 +151,7 @@ function generateQuestions() {
         // };
         
         // 세 개의 질문을 모두 추가
-        [question1, question2, question3].forEach(q => {
+        [question1, question2].forEach(q => {
             questionList.push(q);
         });
     });
@@ -249,10 +250,9 @@ function updateFrame() {
     const imageFrame = document.getElementById("image-frame");
     const frame = frameSlider.value;
     
-    // 현재 프레임 번호 업데이트
+    // Current frame number update
     const currentFrameDisplay = document.getElementById("current-frame");
     if (currentFrameDisplay) {
-        // frame + 1
         currentFrameDisplay.textContent = `${parseInt(frame) + 1}`;
     }
 
@@ -261,27 +261,30 @@ function updateFrame() {
         return;
     }
 
-    // 현재 질문의 이미지 정보
+    // Current question image info
     const questionData = questionList[currentQuestionIndex];
     const { render, object, num } = questionData;
 
-    // 슬라이더 값을 기반으로 이미지 경로 생성
+    // Format frame number with leading zeros (00000, 00001, etc.)
+    const frameString = String(frame).padStart(5, '0');
+    
+    // Create cache key and image path
     const cacheKey = `${render}_${object}_${num}_${frame}`;
     const cachedImagePath = imageCache.getFromCache(cacheKey, 'rendering');
 
     if (cachedImagePath) {
-        // 캐시된 이미지가 있으면 사용
+        // Use cached image if available
         imageFrame.src = cachedImagePath;
     } else {
-        // 없으면 경로 생성하여 로드
-        const imagePath = `images/${render}/${object}/N${num}M100/r_${frame}.png`;
+        // Otherwise load and cache
+        const imagePath = `images/${render}/${object}/${num}/${frameString}.png`;
         imageFrame.src = imagePath;
 
-        // 추가로 캐시에 저장
+        // Add to cache
         imageCache.addToCache(cacheKey, imagePath, 'rendering');
     }
 
-    console.log(`Displaying frame: ${frame}`);
+    console.log(`Displaying frame: ${frame} (${frameString}.png)`);
 }
 
 // 레퍼런스 이미지 로드 함수
@@ -296,8 +299,9 @@ function loadReferenceImages(render, object, num) {
     referenceContainer.innerHTML = "";
 
     // 레퍼런스 폴더 경로
-    const basePath = `images/${render}/${object}/N${num}M100`;
-    const referencePath = `${basePath}/reference`;
+    const objectBase = object && typeof object === 'string' ? object.split("/")[0] : object;
+    
+    const referencePath = `images/references/${objectBase}`;
     const referenceFileListPath = `${referencePath}/file.json`;
 
     console.log(`Loading reference images from: ${referencePath}`);
@@ -568,6 +572,10 @@ function prevQuestion() {
     // 현재 질문 답변 저장 (뒤로 갔다가 다시 돌아올 때를 위해)
     saveCurrentAnswer();
     
+    // 현재 오브젝트 정보 저장
+    const currentObject = questionList[currentQuestionIndex].object;
+    const currentImageIndex = questionList[currentQuestionIndex].imageIndex;
+    
     // 이전 질문으로 이동
     currentQuestionIndex--;
     startTime = Date.now();
@@ -577,8 +585,26 @@ function prevQuestion() {
     
     // 이미지가 변경되었는지 확인하고 업데이트
     const prevImageIndex = questionList[currentQuestionIndex].imageIndex;
-    if (currentQuestionIndex > 0 && prevImageIndex !== questionList[currentQuestionIndex - 1].imageIndex) {
+    const prevObject = questionList[currentQuestionIndex].object;
+    
+    if (prevImageIndex !== currentImageIndex) {
+        // 이미지 캐시 초기화
+        imageCache.clearCache(); // 캐시 완전 초기화
+        console.log("Image cache cleared for previous question");
+        
+        // 새 이미지 업데이트
         updateFrame();
+        
+        // 레퍼런스 이미지 로드
+        const { render, object, num } = questionList[currentQuestionIndex];
+        
+        // 레퍼런스 이미지 폴더 경로 - object에서 첫 부분만 사용
+        const objectBase = object && typeof object === 'string' ? object.split("/")[0] : object;
+        const referencePath = `images/references/${objectBase}`;
+        
+        // 레퍼런스 이미지 로드 함수 호출
+        console.log(`Loading reference images for object: ${objectBase}`);
+        loadReferenceImages(render, object, num);
     }
     
     // 이전에 저장된 답변 복원
@@ -594,6 +620,7 @@ function nextQuestion() {
     
     // 현재 오브젝트 정보 저장
     const currentImageIndex = questionList[currentQuestionIndex].imageIndex;
+    const currentObject = questionList[currentQuestionIndex].object;
     
     // 다음 질문으로 이동
     currentQuestionIndex++;
@@ -610,7 +637,13 @@ function nextQuestion() {
     
     // 이미지가 변경되었는지 확인하고 업데이트
     const newImageIndex = questionList[currentQuestionIndex].imageIndex;
+    const newObject = questionList[currentQuestionIndex].object;
+    
     if (newImageIndex !== currentImageIndex) {
+        // 이미지 캐시 초기화
+        imageCache.clearCache(); // 캐시 완전 초기화
+        console.log("Image cache cleared for new question");
+        
         // 프레임 슬라이더 초기화
         const frameSlider = document.getElementById("frame-slider");
         if (frameSlider) {
@@ -619,10 +652,20 @@ function nextQuestion() {
         
         // 새 이미지 업데이트
         updateFrame();
+        
+        // 레퍼런스 이미지 로드
+        const { render, object, num } = questionList[currentQuestionIndex];
+        
+        // 레퍼런스 이미지 폴더 경로 - object에서 첫 부분만 사용
+        const objectBase = object && typeof object === 'string' ? object.split("/")[0] : object;
+        const referencePath = `images/references/${objectBase}`;
+        
+        // 레퍼런스 이미지 로드 함수 호출
+        console.log(`Loading reference images for object: ${objectBase}`);
+        loadReferenceImages(render, object, num);
     }
 }
 
-// 답변 저장 함수 수정
 // 답변 저장 함수 수정
 function saveCurrentAnswer() {
     const timeSpent = Date.now() - startTime;
@@ -777,14 +820,56 @@ function submitAnswers() {
     };
     
     try {
+        // 로컬 스토리지에 저장
         localStorage.setItem("surveyAnswers", JSON.stringify(finalData));
+        
+        // 파일로 저장 (다운로드)
+        saveToFile(finalData);
+        
         console.log("Answers saved successfully:", finalData);
-        alert("Thank you for your participation! Your answers have been saved.");
+        alert("Thank you for your participation! Your answers have been saved and downloaded.");
         window.location.href = "end.html";
     } catch (error) {
         console.error("Error saving answers:", error);
         alert("There was a problem saving your answers. Please try again.");
     }
+}
+
+// 파일로 데이터 저장하기
+function saveToFile(data) {
+    // JSON 문자열로 변환
+    const jsonData = JSON.stringify(data, null, 2);
+    
+    // Blob 객체 생성
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    
+    // 다운로드 링크 생성
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    
+    // 참가자 정보 가져오기
+    const participantName = data.participantInfo.name || 'anonymous';
+    const participantAge = data.participantInfo.age || 'unknown';
+    
+    // 현재 시간 정보 (파일명 중복 방지용)
+    const now = new Date();
+    const timestamp = now.toISOString()
+        .replace(/[:.]/g, '-')  // : 와 . 을 - 로 변경
+        .replace('T', '_')      // T를 _ 로 변경
+        .slice(0, 19);          // 밀리초 부분 제거
+    
+    // 안전한 파일명 만들기
+    const safeName = participantName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_');
+    
+    // 파일명 설정
+    downloadLink.download = `survey_${safeName}_${participantAge}_${timestamp}.json`;
+    
+    // 클릭하여 다운로드 시작
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    
+    // 링크 요소 제거
+    document.body.removeChild(downloadLink);
 }
 
 // 이미지 캐시 및 프리로딩 관련 기능 추가
@@ -800,17 +885,18 @@ function preloadImagesForCurrentQuestion() {
     const { render, object, num } = questionData;
     
     // 렌더링 이미지 경로 기본 구성
-    const basePath = `images/${render}/${object}/N${num}M100`;
+    const basePath = `images/${render}/${object}/${num}`;
     
     // 모든 슬라이더 프레임 이미지 로드
     const renderingPromises = [];
-    for (let frame = 0; frame <= 100; frame++) {
-        const imagePath = `${basePath}/r_${frame}.png`;
+    for (let frame = 0; frame < 200; frame++) {
+        const frameString = String(frame).padStart(5, '0');
+        const imagePath = `${basePath}/${frameString}.png`;
         renderingPromises.push(preloadImage(imagePath, `${render}_${object}_${num}_${frame}`, 'rendering'));
     }
     
     // 레퍼런스 이미지 경로
-    const referencePath = `${basePath}/reference`;
+    const referencePath = `images/references/${object.split("/")[0]}`;
     const referenceFileListPath = `${referencePath}/file.json`;
     
     // file.json 로드 시도
@@ -1103,21 +1189,6 @@ function loadReferenceImagesWithPreview(referencePaths) {
         thumbnailContainer.appendChild(preview);
         referenceContainer.appendChild(thumbnailContainer);
     });
-}
-
-// 기존 loadReferenceImages 함수 내부에서 호출
-function loadReferenceImages() {
-    // ...기존 코드...
-    
-    fetch(referenceFileListPath)
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.files && Array.isArray(data.files)) {
-                const referencePaths = data.files.map(filename => `${referencePath}/${filename}`);
-                loadReferenceImagesWithPreview(referencePaths);
-            }
-            // ...기존 코드...
-        });
 }
 
 function createLikertQuestion(question, index) {
@@ -1494,4 +1565,121 @@ function createLabelGroup(question) {
     labelGroup.appendChild(rightLabel);
     
     return labelGroup;
+}
+
+// 자동 저장 기능 추가
+let autoSaveInterval;
+
+// 자동 저장 함수
+function autoSaveAnswers() {
+    // 현재 답변과 진행 상태 저장
+    const currentState = {
+        answers: answers,
+        currentQuestionIndex: currentQuestionIndex,
+        timestamp: new Date().toISOString()
+    };
+    
+    try {
+        localStorage.setItem("surveyProgress", JSON.stringify(currentState));
+        console.log("Progress auto-saved at:", currentState.timestamp);
+    } catch (error) {
+        console.error("Error auto-saving progress:", error);
+    }
+}
+
+// 자동 저장 시작
+function startAutoSave(intervalSeconds = 30) {
+    // 이전에 설정된 인터벌이 있으면 중지
+    if (autoSaveInterval) {
+        clearInterval(autoSaveInterval);
+    }
+    
+    // 새 인터벌 설정 (기본 30초)
+    autoSaveInterval = setInterval(autoSaveAnswers, intervalSeconds * 1000);
+    console.log(`Auto-save started, interval: ${intervalSeconds} seconds`);
+}
+
+// 자동 저장 중지
+function stopAutoSave() {
+    if (autoSaveInterval) {
+        clearInterval(autoSaveInterval);
+        autoSaveInterval = null;
+        console.log("Auto-save stopped");
+    }
+}
+
+// 저장된 진행 상황 복원
+function restoreSavedProgress() {
+    const savedProgress = localStorage.getItem("surveyProgress");
+    
+    if (!savedProgress) {
+        console.log("No saved progress found");
+        return false;
+    }
+    
+    try {
+        const progress = JSON.parse(savedProgress);
+        
+        // 유효한 저장 데이터인지 확인
+        if (progress && progress.answers && typeof progress.currentQuestionIndex === 'number') {
+            // 데이터 복원
+            answers = progress.answers;
+            currentQuestionIndex = progress.currentQuestionIndex;
+            
+            console.log(`Restored progress: Question ${currentQuestionIndex + 1} of ${questionList.length}`);
+            return true;
+        }
+    } catch (error) {
+        console.error("Error restoring saved progress:", error);
+    }
+    
+    return false;
+}
+
+// 수동 저장 버튼 기능
+function saveProgress() {
+    saveCurrentAnswer(); // 현재 질문 답변 저장
+    autoSaveAnswers(); // 자동 저장 함수 호출
+    
+    // 사용자에게 알림
+    const timestamp = new Date().toLocaleTimeString();
+    alert(`Progress saved at ${timestamp}`);
+}
+
+// **실험 초기화 함수** 수정
+function initializeExperiment() {
+    if (questionList.length === 0) {
+        console.error("No questions generated");
+        return;
+    }
+    
+    // 저장된 진행 상황이 있는지 확인
+    const hasSavedProgress = restoreSavedProgress();
+    
+    if (hasSavedProgress) {
+        const confirmRestore = confirm("We found a saved progress. Would you like to continue from where you left off?");
+        
+        if (confirmRestore) {
+            // 저장된 상태로 계속 진행
+            updateQuestion(); // 현재 질문 업데이트
+            updateFrame(); // 이미지 업데이트
+        } else {
+            // 새로 시작 (저장된 상태 삭제)
+            localStorage.removeItem("surveyProgress");
+            currentQuestionIndex = 0;
+            answers = {};
+            updateQuestion();
+            updateFrame();
+        }
+    } else {
+        // 새로 시작
+        updateFrame(); // 첫 번째 이미지 로드
+        updateQuestion(); // 첫 번째 질문 로드
+    }
+    
+    startTime = Date.now(); // 시간 측정 시작
+    preloadImagesForCurrentQuestion(); // 현재 질문 이미지 프리로드
+    
+    // 자동 저장 시작 (30초 간격)
+    startAutoSave(10);
 }

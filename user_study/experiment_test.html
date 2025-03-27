@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Evaluation Study</title>
+    <title>Practice Session</title>
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
         <!-- Progress Bar -->
         <div class="progress-container">
             <div id="progress-bar" class="progress-bar"></div>
-            <button id="save-button" onclick="saveProgress()" class="save-button">Save Progress</button>
+            <div class="session-indicator">연습 세션</div>
         </div>
         
         <div class="content-area">
@@ -38,13 +38,19 @@
         </div>
     </div>
     
-    <!-- 실험 완료 버튼 (초기에는 숨김) -->
+    <!-- 연습 완료 버튼 (초기에는 숨김) -->
     <div class="submit-container" style="display: none;">
-        <h2>Experiment Completed</h2>
-        <p>Thank you for your participation!</p>
-        <button onclick="submitAnswers()">Submit</button>
+        <h2>연습 세션 완료</h2>
+        <p>연습 세션이 완료되었습니다. 이제 본 실험을 시작하겠습니다.</p>
+        <button onclick="window.location.href='experiment_index.html'">본 실험 시작하기</button>
     </div>
     
+    <script>
+        // 연습용 설정
+        const isTestMode = true;
+        const imagesJsonPath = "images_test.json"; // 연습용 이미지 목록
+        const questionsJsonPath = "questions_test.json"; // 연습용 질문 목록
+    </script>
     <script src="scripts/main.js"></script>
 </body>
 </html>

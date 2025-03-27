@@ -15,11 +15,11 @@
         "labels": ["Not Consistent", "Very Consistent"]
       },
       {
-        "type": "likert",
-        "question": "How realistic does the reconstructed 3D object look to you?",
-        "required": true,
-        "scale": 5,
-        "labels": ["Not Realistic", "Very Realistic"]
+        "type": "instruction",
+        "required": false,
+        "title": "테스트 완료 - 본 실험 시작",
+        "content": "축하합니다! 테스트 섹션이 완료되었습니다. 이제 본 실험을 시작하겠습니다. 다음 화면에서는 다양한 객체와 렌더링 기법에 대한 평가를 진행합니다. 계속하려면 '다음' 버튼을 클릭하세요.",
+        "imageIndex": -1
       }
     ]
   }

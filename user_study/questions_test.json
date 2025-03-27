@@ -1,0 +1,41 @@
+[
+    {
+        "type": "likert",
+        "required": true,
+        "question": "How would you rate the overall visual quality of this image?",
+        "min_label": "Very Poor",
+        "max_label": "Excellent",
+        "options": 5,
+        "render": "test",
+        "object": "lego",
+        "num": "1",
+        "imageIndex": 0
+    },
+    {
+        "type": "multiplechoice",
+        "required": true,
+        "question": "Which aspect of this image appears most natural?",
+        "options": [
+            "Shadow representation",
+            "Material texture",
+            "Overall shape",
+            "Color"
+        ],
+        "render": "test",
+        "object": "lego",
+        "num": "1",
+        "imageIndex": 0
+    },
+    {
+        "type": "likert",
+        "required": true,
+        "question": "How would you rate the overall visual quality of this image?",
+        "min_label": "Very Poor",
+        "max_label": "Excellent",
+        "options": 5,
+        "render": "test",
+        "object": "ship",
+        "num": "1",
+        "imageIndex": 1
+    }
+]
