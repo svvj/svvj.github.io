@@ -82,11 +82,11 @@ function generateQuestions() {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "How realistic does this image look?",
+            question: "How satisfied are you with the overall quality of the reconstructed 3D object?",
             required: true,
             type: "likert",
-            scale: 7,
-            labels: ["Not realistic at all", "Extremely realistic"],
+            scale: 5,
+            labels: ["Not Satisfied", "Very Satisfied"],
             imageIndex: imgIndex
         };
         
@@ -95,51 +95,62 @@ function generateQuestions() {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "How clear is this image?",
+            question: "How consistent does the reconstructed object appear when compared to the reference view(s)?",
             required: true,
             type: "likert",
-            scale: 7,
-            labels: ["Not clear at all", "Extremely clear"],
+            scale: 5,
+            labels: ["Not Consistent", "Very Consistent"],
             imageIndex: imgIndex
         };
-        // 질문 4: 다중 선택 (체크박스)
         const question3 = {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "Which aspects of this image look most realistic? (Select all that apply)",
-            required: false,
-            type: "checkbox",
-            options: [
-                "Lighting", 
-                "Textures", 
-                "Shapes", 
-                "Colors", 
-                "Shadows", 
-                "None of the above"
-            ],
-            imageIndex: imgIndex
-        };
-        // 새로운 선택형 질문 추가
-        const question4 = {
-            render: img.render,
-            object: img.object,
-            num: img.num,
-            question: "Which best describes the object in this image?",
+            question: "How realistic does the reconstructed 3D object look to you?",
             required: true,
-            type: "multiplechoice",  // 새로운 타입
-            options: [               // 선택 옵션
-                "Very unrealistic",
-                "Somewhat unrealistic", 
-                "Neutral", 
-                "Somewhat realistic", 
-                "Very realistic"
-            ],
+            type: "likert",
+            scale: 5,
+            labels: ["Not Realistic", "Very Realistic"],
             imageIndex: imgIndex
         };
+        // // 질문 4: 다중 선택 (체크박스)
+        // const question3 = {
+        //     render: img.render,
+        //     object: img.object,
+        //     num: img.num,
+        //     question: "How realistic does the reconstructed 3D object look to you?",
+        //     required: false,
+        //     type: "checkbox",
+        //     options: [
+        //         "Lighting", 
+        //         "Textures", 
+        //         "Shapes", 
+        //         "Colors", 
+        //         "Shadows", 
+        //         "None of the above"
+        //     ],
+        //     imageIndex: imgIndex
+        // };
+        // // 새로운 선택형 질문 추가
+        // const question4 = {
+        //     render: img.render,
+        //     object: img.object,
+        //     num: img.num,
+        //     question: "Which best describes the object in this image?",
+        //     required: true,
+        //     type: "multiplechoice",  // 새로운 타입
+        //     options: [               // 선택 옵션
+        //         "Very unrealistic",
+        //         "Somewhat unrealistic", 
+        //         "Neutral", 
+        //         "Somewhat realistic", 
+        //         "Very realistic"
+        //     ],
+        //     imageIndex: imgIndex
+        // };
         
         // 세 개의 질문을 모두 추가
-        [question1, question2, question3, question4].forEach(q => {
+        [question1, question2, question3].forEach(q => {
             questionList.push(q);
         });
     });
@@ -1137,10 +1148,10 @@ function createLikertQuestion(question, index) {
     const numberRow = document.createElement("tr");
     
     // 1-7까지 라디오 버튼 생성 (모두 동일한 너비)
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 5; i++) {
         const radioCell = document.createElement("td");
         radioCell.style.textAlign = "center";
-        radioCell.style.width = "14.28%"; // 7개 열이므로 약 100% ÷ 7
+        radioCell.style.width = "20%"; // 7개 열이므로 약 100% ÷ 5
         
         const radio = document.createElement("input");
         radio.type = "radio";
@@ -1158,7 +1169,7 @@ function createLikertQuestion(question, index) {
         
         const numberCell = document.createElement("td");
         numberCell.style.textAlign = "center";
-        numberCell.style.width = "14.28%"; // 동일한 너비
+        numberCell.style.width = "20%"; // 동일한 너비
         numberCell.textContent = i;
         numberRow.appendChild(numberCell);
     }
@@ -1173,7 +1184,11 @@ function createLikertQuestion(question, index) {
     const leftCell = document.createElement("td");
     leftCell.colSpan = "3";
     leftCell.style.textAlign = "left";
-    leftCell.style.fontWeight = "bold";
+    // leftCell.style.fontWeight = "bold";
+    leftCell.style.whiteSpace = "nowrap"; // 텍스트 줄바꿈 방지
+    leftCell.style.overflow = "visible"; // 텍스트가 보이도록 설정
+    leftCell.style.paddingRight = "10px"; // 오른쪽 패딩 추가
+    leftCell.style.fontSize = "12px"; // 폰트 크기 줄임
     leftCell.textContent = labels[0]; // 첫 번째 레이블
     
     // 중간 빈 칸
@@ -1184,7 +1199,11 @@ function createLikertQuestion(question, index) {
     const rightCell = document.createElement("td");
     rightCell.colSpan = "3";
     rightCell.style.textAlign = "right";
-    rightCell.style.fontWeight = "bold";
+    rightCell.style.whiteSpace = "nowrap"; // 텍스트 줄바꿈 방지
+    rightCell.style.overflow = "visible"; // 텍스트가 보이도록 설정
+    rightCell.style.paddingLeft = "10px"; // 왼쪽 패딩 추가
+    rightCell.style.fontSize = "12px"; // 폰트 크기 줄임
+    // rightCell.style.fontWeight = "bold";
     rightCell.textContent = labels[1]; // 두 번째 레이블
 
     // 레이블 행에 셀 추가
