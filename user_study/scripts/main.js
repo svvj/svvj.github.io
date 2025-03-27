@@ -1,8 +1,19 @@
+if (typeof window.isTestMode === 'undefined') {
+    window.isTestMode = false;
+}
+if (typeof window.imagesJsonPath === 'undefined') {
+    window.imagesJsonPath = "images.json";
+}
+if (typeof window.questionsJsonPath === 'undefined') {
+    window.questionsJsonPath = "questions.json";
+}
+
 let currentQuestionIndex = 0;
 let answers = {};
 let startTime;
 let questionList = [];
 let imageSequence = [];
+
 
 
 const imageCache = {
@@ -41,8 +52,21 @@ const participantInfo = JSON.parse(localStorage.getItem("participantInfo")) || {
 
 // **초기화 함수**
 document.addEventListener("DOMContentLoaded", function() {
+    console.log("Test mode:", window.isTestMode ? "Enabled" : "Disabled");
+    console.log("Loading images from:", window.imagesJsonPath);
+    console.log("Loading questions from:", window.questionsJsonPath);
+
+    // Show test mode indicator if in test mode
+    if (window.isTestMode) {
+        const sessionIndicator = document.querySelector(".session-indicator");
+        if (sessionIndicator) {
+            sessionIndicator.textContent = "Practice Session";
+            sessionIndicator.style.backgroundColor = "#ff9800";
+        }
+    }
+    
     // JSON 파일에서 이미지 목록 로드
-    fetch("images.json")
+    fetch(window.imagesJsonPath)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -53,13 +77,13 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!data || data.length === 0) {
                 throw new Error("Images data is empty or invalid");
             }
-            console.log("Successfully loaded images.json:", data);
+            console.log("Successfully loaded images:", data);
             imageSequence = data;
             generateQuestions();
             initializeExperiment();
         })
         .catch(error => {
-            console.error("Error loading images.json:", error);
+            console.error("Error loading images:", error);
             alert(`Failed to load experiment data: ${error.message}. Please refresh the page and try again.`);
         });
 });
@@ -77,8 +101,12 @@ function generateQuestions() {
         return;
     }
 
-    // 각 이미지에 대해 3개의 질문 생성
-    imageSequence.forEach((img, imgIndex) => {
+    // 이미지 순서 랜덤화
+    const randomizedImages = randomizeImageSequence(imageSequence);
+    console.log("Images randomized for participant:", participantInfo.name);
+    
+    // 각 이미지에 대해 2개의 질문 생성
+    randomizedImages.forEach((img, imgIndex) => {
         const question1 = {
             render: img.render,
             object: img.object,
@@ -91,7 +119,7 @@ function generateQuestions() {
             imageIndex: imgIndex
         };
         
-        // 질문 2: 선명도 (라이커트 스케일)
+        // 질문 2: 일관성 (라이커트 스케일)
         const question2 = {
             render: img.render,
             object: img.object,
@@ -103,60 +131,69 @@ function generateQuestions() {
             labels: ["Not Consistent", "Very Consistent"],
             imageIndex: imgIndex
         };
-        // const question3 = {
-        //     render: img.render,
-        //     object: img.object,
-        //     num: img.num,
-        //     question: "How realistic does the reconstructed 3D object look to you?",
-        //     required: true,
-        //     type: "likert",
-        //     scale: 5,
-        //     labels: ["Not Realistic", "Very Realistic"],
-        //     imageIndex: imgIndex
-        // };
-        // // 질문 4: 다중 선택 (체크박스)
-        // const question3 = {
-        //     render: img.render,
-        //     object: img.object,
-        //     num: img.num,
-        //     question: "How realistic does the reconstructed 3D object look to you?",
-        //     required: false,
-        //     type: "checkbox",
-        //     options: [
-        //         "Lighting", 
-        //         "Textures", 
-        //         "Shapes", 
-        //         "Colors", 
-        //         "Shadows", 
-        //         "None of the above"
-        //     ],
-        //     imageIndex: imgIndex
-        // };
-        // // 새로운 선택형 질문 추가
-        // const question4 = {
-        //     render: img.render,
-        //     object: img.object,
-        //     num: img.num,
-        //     question: "Which best describes the object in this image?",
-        //     required: true,
-        //     type: "multiplechoice",  // 새로운 타입
-        //     options: [               // 선택 옵션
-        //         "Very unrealistic",
-        //         "Somewhat unrealistic", 
-        //         "Neutral", 
-        //         "Somewhat realistic", 
-        //         "Very realistic"
-        //     ],
-        //     imageIndex: imgIndex
-        // };
         
-        // 세 개의 질문을 모두 추가
+        // 두 개의 질문을 모두 추가
         [question1, question2].forEach(q => {
             questionList.push(q);
         });
     });
 
-    console.log(`Generated ${questionList.length} questions from ${imageSequence.length} images`);
+    console.log(`Generated ${questionList.length} questions from ${randomizedImages.length} images`);
+    
+    // 랜덤화된 이미지 순서를 localStorage에 저장 (분석용)
+    saveRandomizedSequence(randomizedImages);
+}
+
+/**
+ * 이미지 시퀀스를 랜덤화합니다.
+ * @param {Array} images - 원본 이미지 배열
+ * @returns {Array} 랜덤화된 이미지 배열
+ */
+function randomizeImageSequence(images) {
+    // 원본 배열 복사 (참조 변경 방지)
+    const imagesToRandomize = [...images];
+    
+    // Fisher-Yates (Knuth) 셔플 알고리즘
+    for (let i = imagesToRandomize.length - 1; i > 0; i--) {
+        // 0부터 i까지의 랜덤한 인덱스 생성
+        const j = Math.floor(Math.random() * (i + 1));
+        // i번째와 j번째 요소 교환
+        [imagesToRandomize[i], imagesToRandomize[j]] = [imagesToRandomize[j], imagesToRandomize[i]];
+    }
+    
+    return imagesToRandomize;
+}
+
+/**
+ * 랜덤화된 이미지 순서를 저장합니다 (나중에 분석할 때 유용함).
+ * @param {Array} randomizedSequence - 랜덤화된 이미지 시퀀스
+ */
+function saveRandomizedSequence(randomizedSequence) {
+    // 이미지 정보만 추출 (객체, 렌더링 타입, 번호)
+    const sequenceInfo = randomizedSequence.map((img, index) => ({
+        index: index,
+        render: img.render,
+        object: img.object,
+        num: img.num
+    }));
+    
+    // 참가자 ID와 함께 저장
+    const sequenceData = {
+        participantId: participantInfo.name || 'anonymous',
+        timestamp: new Date().toISOString(),
+        sequence: sequenceInfo
+    };
+    
+    // localStorage에 저장
+    try {
+        localStorage.setItem("randomizedSequence", JSON.stringify(sequenceData));
+        console.log("Randomized sequence saved successfully");
+    } catch (error) {
+        console.error("Error saving randomized sequence:", error);
+    }
+    
+    // 결과 데이터에도 이 정보 추가 (제출 시 포함되도록)
+    answers.randomizedSequence = sequenceInfo;
 }
 
 // **실험 초기화 함수**
@@ -813,6 +850,13 @@ function showSubmitButton() {
 
 // **답변 제출 및 저장**
 function submitAnswers() {
+    // 테스트 모드인 경우 메인 실험으로 리디렉션
+    if (window.isTestMode) {
+        console.log("Test mode completed, redirecting to main experiment");
+        window.location.href = "experiment_index.html";
+        return;
+    }
+    
     const finalData = {
         participantInfo: participantInfo,
         responses: answers,
@@ -823,53 +867,34 @@ function submitAnswers() {
         // 로컬 스토리지에 저장
         localStorage.setItem("surveyAnswers", JSON.stringify(finalData));
         
-        // 파일로 저장 (다운로드)
-        saveToFile(finalData);
+        const jsonData = JSON.stringify(finalData, null, 2);
+        const blob = new Blob([jsonData], { type: 'application/json' });
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        
+        // 참가자 정보로 파일명 생성
+        const participantName = finalData.participantInfo.name || 'anonymous';
+        const participantAge = finalData.participantInfo.age || 'unknown';
+        const timestamp = new Date().toISOString()
+            .replace(/[:.]/g, '-')
+            .replace('T', '_')
+            .slice(0, 19);
+        
+        const safeName = participantName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_');
+        downloadLink.download = `survey_${safeName}_${participantAge}_${timestamp}.json`;
+        
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
         
         console.log("Answers saved successfully:", finalData);
-        alert("Thank you for your participation! Your answers have been saved and downloaded.");
+        
+        // 파일 저장 후 end.html로 리다이렉션 (알림 없음)
         window.location.href = "end.html";
     } catch (error) {
         console.error("Error saving answers:", error);
         alert("There was a problem saving your answers. Please try again.");
     }
-}
-
-// 파일로 데이터 저장하기
-function saveToFile(data) {
-    // JSON 문자열로 변환
-    const jsonData = JSON.stringify(data, null, 2);
-    
-    // Blob 객체 생성
-    const blob = new Blob([jsonData], { type: 'application/json' });
-    
-    // 다운로드 링크 생성
-    const downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    
-    // 참가자 정보 가져오기
-    const participantName = data.participantInfo.name || 'anonymous';
-    const participantAge = data.participantInfo.age || 'unknown';
-    
-    // 현재 시간 정보 (파일명 중복 방지용)
-    const now = new Date();
-    const timestamp = now.toISOString()
-        .replace(/[:.]/g, '-')  // : 와 . 을 - 로 변경
-        .replace('T', '_')      // T를 _ 로 변경
-        .slice(0, 19);          // 밀리초 부분 제거
-    
-    // 안전한 파일명 만들기
-    const safeName = participantName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_');
-    
-    // 파일명 설정
-    downloadLink.download = `survey_${safeName}_${participantAge}_${timestamp}.json`;
-    
-    // 클릭하여 다운로드 시작
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    
-    // 링크 요소 제거
-    document.body.removeChild(downloadLink);
 }
 
 // 이미지 캐시 및 프리로딩 관련 기능 추가
@@ -1682,4 +1707,147 @@ function initializeExperiment() {
     
     // 자동 저장 시작 (30초 간격)
     startAutoSave(10);
+}
+
+// 문서 맨 아래에 추가하세요
+
+// 개발자 모드 토글 상태
+let devModeEnabled = false;
+
+/**
+ * 개발자 모드 키보드 단축키 설정
+ */
+document.addEventListener('keydown', function(event) {
+    // Ctrl + Shift + D로 개발자 모드 토글
+    if (event.ctrlKey && event.shiftKey && event.key === 'D') {
+        devModeEnabled = !devModeEnabled;
+        console.log(`Developer mode ${devModeEnabled ? 'enabled' : 'disabled'}`);
+        
+        // 화면에 알림 표시
+        const notification = document.createElement('div');
+        notification.textContent = `Developer Mode: ${devModeEnabled ? 'ON' : 'OFF'}`;
+        notification.style.position = 'fixed';
+        notification.style.top = '10px';
+        notification.style.left = '50%';
+        notification.style.transform = 'translateX(-50%)';
+        notification.style.backgroundColor = devModeEnabled ? '#4caf50' : '#f44336';
+        notification.style.color = 'white';
+        notification.style.padding = '8px 16px';
+        notification.style.borderRadius = '4px';
+        notification.style.zIndex = '9999';
+        notification.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+        
+        document.body.appendChild(notification);
+        
+        // 3초 후 알림 제거
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 3000);
+        
+        return;
+    }
+    
+    // 개발자 모드가 활성화된 경우에만 아래 단축키 동작
+    if (!devModeEnabled) return;
+    
+    // 스페이스바: 현재 질문 자동 완성
+    if (event.code === 'Space') {
+        event.preventDefault();
+        autoCompleteCurrentQuestion();
+    }
+    
+    // N 키: 다음 질문으로 강제 이동
+    if (event.key === 'n' || event.key === 'N') {
+        event.preventDefault();
+        forceNextQuestion();
+    }
+    
+    // S 키: 실험 종료 화면으로 건너뛰기
+    if (event.key === 's' || event.key === 'S') {
+        event.preventDefault();
+        skipToEnd();
+    }
+    
+    // 숫자 키 1~5: 라이커트 척도 빠른 선택
+    if (['1', '2', '3', '4', '5'].includes(event.key)) {
+        const activeQuestion = document.querySelector('.question.active');
+        if (activeQuestion) {
+            const radioButton = activeQuestion.querySelector(`input[value="${event.key}"]`);
+            if (radioButton) {
+                radioButton.checked = true;
+            }
+        }
+    }
+});
+
+/**
+ * 현재 질문 자동 완성
+ */
+function autoCompleteCurrentQuestion() {
+    const activeQuestion = document.querySelector('.question.active');
+    if (!activeQuestion) return;
+    
+    const questionData = questionList[currentQuestionIndex];
+    if (!questionData) return;
+    
+    console.log("Auto-completing question:", currentQuestionIndex);
+    
+    switch(questionData.type) {
+        case "likert":
+            // 중간 값 선택 (3)
+            const radioButton = activeQuestion.querySelector('input[value="3"]');
+            if (radioButton) radioButton.checked = true;
+            break;
+            
+        case "multiplechoice":
+            // 첫 번째 옵션 선택
+            const firstOption = activeQuestion.querySelector('input[type="radio"]');
+            if (firstOption) firstOption.checked = true;
+            break;
+            
+        case "checkbox":
+            // 첫 번째 옵션 선택
+            const firstCheckbox = activeQuestion.querySelector('input[type="checkbox"]');
+            if (firstCheckbox) firstCheckbox.checked = true;
+            break;
+            
+        case "textarea":
+            // 텍스트 입력
+            const textarea = activeQuestion.querySelector('textarea');
+            if (textarea) textarea.value = "Auto-generated response";
+            break;
+    }
+}
+
+/**
+ * 유효성 검사 없이 다음 질문으로 강제 이동
+ */
+function forceNextQuestion() {
+    // 현재 질문 응답 저장
+    saveCurrentAnswer();
+    
+    // 다음 질문으로 이동
+    currentQuestionIndex++;
+    startTime = Date.now();
+    
+    // 실험이 끝났는지 확인
+    if (currentQuestionIndex >= questionList.length) {
+        showSubmitButton();
+        return;
+    }
+    
+    // 새로운 질문 업데이트
+    updateQuestion();
+    updateFrame();
+    
+    console.log("Forced to next question:", currentQuestionIndex);
+}
+
+/**
+ * 모든 질문을 건너뛰고 종료 화면으로 이동
+ */
+function skipToEnd() {
+    currentQuestionIndex = questionList.length - 1;
+    showSubmitButton();
+    console.log("Skipped to end");
 }

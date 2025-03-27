@@ -5,22 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Practice Session</title>
     <link rel="stylesheet" href="styles/main.css">
+    <script>
+        // Set window variables BEFORE loading main.js
+        window.isTestMode = true;
+        window.imagesJsonPath = "images_test.json";
+        window.questionsJsonPath = "questions_test.json";
+    </script>
 </head>
 <body>
     <div class="experiment-container">
         <!-- Progress Bar -->
         <div class="progress-container">
             <div id="progress-bar" class="progress-bar"></div>
-            <div class="session-indicator">연습 세션</div>
+            <div class="session-indicator">Practice Session</div>
         </div>
         
         <div class="content-area">
-            <!-- 왼쪽 레퍼런스 이미지 섹션 -->
+            <!-- Left Reference Images Section -->
             <div class="reference-container" id="reference-container">
-                <!-- 레퍼런스 이미지 썸네일들이 동적으로 추가됩니다 -->
+                <!-- Reference image thumbnails will be added dynamically -->
             </div>
 
-            <!-- 중앙 메인 이미지 섹션 -->
+            <!-- Center Main Image Section -->
             <div class="image-container">
                 <div class="image-wrapper">
                     <img id="image-frame" src="" alt="Main Image">
@@ -31,26 +37,20 @@
                 </div>
             </div>
 
-            <!-- 오른쪽 질문 섹션 -->
+            <!-- Right Questions Section -->
             <div class="question-container">
-                <!-- 질문들이 동적으로 추가됩니다 -->
+                <!-- Questions will be added dynamically -->
             </div>
         </div>
     </div>
     
-    <!-- 연습 완료 버튼 (초기에는 숨김) -->
+    <!-- Practice Completion (Initially Hidden) -->
     <div class="submit-container" style="display: none;">
-        <h2>연습 세션 완료</h2>
-        <p>연습 세션이 완료되었습니다. 이제 본 실험을 시작하겠습니다.</p>
-        <button onclick="window.location.href='experiment_index.html'">본 실험 시작하기</button>
+        <h2>Practice Session Completed</h2>
+        <p>You have completed the practice session. Now you can move on to the main experiment.</p>
+        <button onclick="window.location.href='experiment_index.html'">Start Main Experiment</button>
     </div>
     
-    <script>
-        // 연습용 설정
-        const isTestMode = true;
-        const imagesJsonPath = "images_test.json"; // 연습용 이미지 목록
-        const questionsJsonPath = "questions_test.json"; // 연습용 질문 목록
-    </script>
     <script src="scripts/main.js"></script>
 </body>
 </html>

@@ -1,6 +1,4 @@
 [
-    { "render": "test", "object": "lego", "num": "1"},
-    { "render": "test", "object": "ship", "num": "1"},
     { "render": "even", "object": "chair", "num": "N5RN0" },
     { "render": "even", "object": "chair", "num": "N5RN20" },
     { "render": "even", "object": "chair", "num": "N5RN50" },
