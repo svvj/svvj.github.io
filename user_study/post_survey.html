@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Questions</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        /* 기본 컨테이너 스타일 */
+        .post-survey-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden; /* 내용이 삐져나가지 않도록 */
+        }
+        
+        /* 질문 박스 스타일 */
+        .question-box {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            overflow-wrap: break-word; /* 긴 텍스트 처리 */
+            word-wrap: break-word; /* IE 지원 */
+        }
+        
+        /* 옵션 컨테이너 */
+        .options-container {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column; /* 세로 배치 */
+            gap: 8px; /* 옵션 간격 */
+        }
+        
+        /* 옵션 스타일 */
+        .option {
+            padding: 12px;
+            background-color: #fff;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            transition: background-color 0.2s;
+            display: flex; /* 플렉스 사용 */
+            align-items: flex-start; /* 상단 정렬 */
+        }
+        
+        .option:hover {
+            background-color: #f0f7ff;
+        }
+        
+        /* 인풋 스타일 */
+        input[type="radio"], input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 3px; /* 텍스트와 정렬 조정 */
+            flex-shrink: 0; /* 축소 방지 */
+        }
+        
+        /* 레이블 스타일 */
+        .option label {
+            flex-grow: 1; /* 남은 공간 차지 */
+            word-break: break-word; /* 긴 텍스트 줄바꿈 */
+        }
+        
+        /* 텍스트에리어 스타일 */
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+        }
+        
+        /* 제출 버튼 스타일 */
+        .submit-button {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-button:hover {
+            background-color: #2980b9;
+        }
+        
+        /* 헤딩 스타일 */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-bottom: 15px;
+            font-size: 20px;
+            line-height: 1.4;
+        }
+        
+        /* 필수 표시 스타일 */
+        .required-label {
+            color: red;
+            font-weight: normal;
+        }
+        
+        /* 프로그레스 바 */
+        .progress-container {
+            margin-bottom: 30px;
+            border-radius: 5px;
+            overflow: hidden; /* 프로그레스 바가 삐져나가지 않도록 */
+            background-color: #f1f1f1;
+        }
+        
+        #progress-bar {
+            height: 10px;
+            background-color: #3498db;
+            width: 90%;
+        }
+        
+        /* 설명 텍스트 */
+        p {
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #555;
+        }
+        
+        /* Other factors 텍스트 에리어 컨테이너 */
+        .textarea-container {
+            margin-top: 8px;
+            margin-left: 28px; /* 체크박스 + 마진과 정렬 */
+        }
+    </style>
+</head>
+<body>
+    <div class="post-survey-container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        
+        <h1>Overall Evaluation Questions</h1>
+        <p>Thank you for completing the individual assessments. Now we'd like to ask a few questions about your overall experience with all the images you've evaluated.</p>
+        
+        <!-- Influence Factors Question -->
+        <div class="question-box">
+            <h2>Which of the following factors most influenced your evaluation of the 3D reconstruction quality? <span class="required-label">*</span></h2>
+            <div class="options-container">
+                <div class="option">
+                    <input type="radio" id="factor2" name="influence_factors" value="geometry">
+                    <label for="factor2">Geometry and shapes</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="factor3" name="influence_factors" value="texture">
+                    <label for="factor3">Texture quality</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="factor5" name="influence_factors" value="consistency">
+                    <label for="factor5">Consistency across different frames</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="factor6" name="influence_factors" value="other">
+                    <label for="factor6">Other (please specify):</label>
+                </div>
+                <div class="textarea-container" id="other_factors_container" style="display: none;">
+                    <textarea id="other_factors" placeholder="Please describe other factors that influenced your evaluation..."></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Artifacts Question -->
+        <div class="question-box">
+            <h2>Which of the following artifact types had the most impact on your evaluation? <span class="required-label">*</span></h2>
+            <div class="options-container">
+                <div class="option">
+                    <input type="radio" id="artifact1" name="artifacts" value="blurriness">
+                    <label for="artifact1">Blurriness or lack of detail</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="artifact2" name="artifacts" value="flickering">
+                    <label for="artifact2">Flickering or popping</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="artifact3" name="artifacts" value="floating">
+                    <label for="artifact3">Floating points or particles</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="artifact4" name="artifacts" value="missing">
+                    <label for="artifact4">Missing parts or holes</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="artifact5" name="artifacts" value="distortion">
+                    <label for="artifact5">Shape distortion</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="artifact6" name="artifacts" value="discoloration">
+                    <label for="artifact6">Color inconsistencies or discoloration</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="artifact7" name="artifacts" value="other">
+                    <label for="artifact7">Other (please specify):</label>
+                </div>
+                <div class="textarea-container" id="other_artifacts_container" style="display: none;">
+                    <textarea id="other_artifacts" placeholder="Please describe the other artifacts..."></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Comments -->
+        <div class="question-box">
+            <h2>Do you have any additional comments or observations about the 3D reconstructions?</h2>
+            <textarea id="additional_comments" placeholder="Share your thoughts, comments, or observations..."></textarea>
+        </div>
+
+        <!-- Overall Experiment Feedback -->
+        <div class="question-box">
+            <h2>Do you have any feedback about the experiment itself?</h2>
+            <p style="font-size: 14px; font-style: italic; margin-bottom: 15px;">
+                This could include comments about the clarity of instructions, usability of the interface, 
+                experiment length, or any suggestions for improvements.
+            </p>
+            <textarea id="experiment_feedback" placeholder="Share your feedback about the experiment process, interface, or any other aspects..."></textarea>
+        </div>
+        
+        <button class="submit-button" onclick="submitFinalSurvey()">Complete Evaluation</button>
+    </div>
+    
+    <script>
+        // 이전 설문 데이터 가져오기 - 오류 처리 추가
+        let surveyAnswers = {}; 
+        try {
+            const savedData = localStorage.getItem("surveyAnswers");
+            if (savedData) {
+                surveyAnswers = JSON.parse(savedData);
+                console.log("Successfully loaded previous answers");
+            } else {
+                console.warn("No previous answers found in localStorage");
+            }
+        } catch (error) {
+            console.error("Error loading previous answers:", error);
+        }
+        
+        // "Other" 옵션 처리
+        document.querySelector('input[id="factor6"]').addEventListener("change", function() {
+            document.getElementById("other_factors_container").style.display = 
+                this.checked ? "block" : "none";
+        });
+        
+        document.getElementById("artifact7").addEventListener("change", function() {
+            document.getElementById("other_artifacts_container").style.display = 
+                this.checked ? "block" : "none";
+        });
+        
+        function submitFinalSurvey() {
+            // 필수 항목 검증
+            const influenceFactor = document.querySelector('input[name="influence_factors"]:checked');
+            const artifacts = document.querySelector('input[name="artifacts"]:checked');
+            
+            if (!influenceFactor) {
+                alert("Please select one factor that most influenced your evaluation.");
+                return;
+            }
+            
+            if (!artifacts) {
+                alert("Please select an artifact type that had the most impact.");
+                return;
+            }
+            
+            try {
+                // 응답 수집
+                const factorValue = influenceFactor.value;
+                const otherFactorsText = factorValue === 'other' ? document.getElementById("other_factors").value : '';
+                const artifactValue = artifacts.value;
+                const otherArtifactsText = artifactValue === 'other' ? document.getElementById("other_artifacts").value : '';
+                const additionalComments = document.getElementById("additional_comments").value;
+                const experimentFeedback = document.getElementById("experiment_feedback").value;
+                
+                // 최종 응답 생성
+                const finalSurveyData = {
+                    mainInfluenceFactor: factorValue,
+                    otherFactors: otherFactorsText,
+                    mainArtifact: artifactValue,
+                    otherArtifacts: otherArtifactsText,
+                    additionalComments: additionalComments,
+                    experimentFeedback: experimentFeedback,
+                    completedAt: new Date().toISOString()
+                };
+                
+                // 기존 설문 데이터와 병합
+                if (!surveyAnswers) surveyAnswers = {};
+                surveyAnswers.finalSurvey = finalSurveyData;
+                
+                // 로컬 스토리지에 저장 시도
+                try {
+                    localStorage.setItem("surveyAnswers", JSON.stringify(surveyAnswers));
+                    console.log("Final survey responses saved to localStorage:", finalSurveyData);
+                } catch (storageError) {
+                    console.warn("Could not save to localStorage:", storageError);
+                }
+                
+                // 파일 다운로드 구현
+                const participantName = surveyAnswers.participantInfo ? 
+                                      surveyAnswers.participantInfo.name || "participant" : 
+                                      "participant";
+                
+                const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+                const filename = `survey_responses_${participantName}_${timestamp}.json`;
+                
+                // JSON 데이터를 Blob으로 변환
+                const jsonData = JSON.stringify(surveyAnswers, null, 2);
+                const blob = new Blob([jsonData], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                
+                // 다운로드 링크 생성 및 클릭
+                const downloadLink = document.createElement("a");
+                downloadLink.href = url;
+                downloadLink.download = filename;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                
+                // 리소스 정리
+                setTimeout(() => {
+                    document.body.removeChild(downloadLink);
+                    URL.revokeObjectURL(url);
+                    
+                    // 완료 메시지 후 이동
+                    alert("Thank you for completing the evaluation! Your responses have been downloaded automatically.");
+                    window.location.href = "end.html";
+                }, 100);
+                
+            } catch (error) {
+                console.error("Error in submit process:", error);
+                alert("There was a problem processing your responses. Please try again.");
+            }
+        }
+    </script>
+</body>
+</html>

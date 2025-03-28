@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice - Final Questions</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .post-survey-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .question-box {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #ff9800; /* 테스트 버전은 오렌지색 */
+        }
+        
+        /* 나머지 스타일은 위와 동일 */
+
+        .session-indicator {
+            background-color: #ff9800;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="post-survey-container">
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar" style="width: 90%;"></div>
+        </div>
+        
+        <div class="session-indicator">Practice Session</div>
+        <h1>Practice - Overall Evaluation Questions</h1>
+        <p>You've completed the individual assessments for the practice session. Now please answer these general questions to complete your practice.</p>
+        
+        <!-- 동일한 종합 질문들 -->
+        <!-- Influence Factors Question -->
+        <div class="question-box">
+            <h2>Which of the following factors most influenced your evaluation of the 3D reconstruction quality? <span class="required-label">*</span></h2>
+            <div class="options-container">
+                <div class="option">
+                    <input type="checkbox" id="factor1" name="influence_factors" value="appearance">
+                    <label for="factor1">Visual appearance (photorealism)</label>
+                </div>
+                <!-- 다른 옵션들... -->
+            </div>
+        </div>
+        
+        <!-- Artifacts Question -->
+        <div class="question-box">
+            <h2>Which of the following artifact types had the most impact on your evaluation? <span class="required-label">*</span></h2>
+            <div class="options-container">
+                <div class="option">
+                    <input type="radio" id="artifact1" name="artifacts" value="blurriness">
+                    <label for="artifact1">Blurriness or lack of detail</label>
+                </div>
+                <!-- 다른 옵션들... -->
+            </div>
+        </div>
+        
+        <!-- Additional Comments -->
+        <div class="question-box">
+            <h2>Do you have any additional comments or observations about the practice session?</h2>
+            <textarea id="additional_comments" placeholder="Share your thoughts, comments, or observations..."></textarea>
+        </div>
+        
+        <button class="submit-button" onclick="submitTestFinalSurvey()">Complete Practice & Start Main Experiment</button>
+    </div>
+    
+    <script>
+        function submitTestFinalSurvey() {
+            // 필수 항목 검증
+            const influenceFactors = document.querySelectorAll('input[name="influence_factors"]:checked');
+            const artifacts = document.querySelector('input[name="artifacts"]:checked');
+            
+            if (influenceFactors.length === 0) {
+                alert("Please select at least one factor that influenced your evaluation.");
+                return;
+            }
+            
+            if (!artifacts) {
+                alert("Please select an artifact type that had the most impact.");
+                return;
+            }
+            
+            // 테스트 모드이므로 연습용 데이터는 저장하지 않고 메인 실험으로 이동
+            alert("Practice session completed. You will now proceed to the main experiment.");
+            window.location.href = "experiment.html";
+        }
+    </script>
+</body>
+</html>

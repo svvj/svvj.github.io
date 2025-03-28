@@ -3,25 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiment Complete</title>
+    <title>Evaluation Complete</title>
     <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .completion-container {
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 50px;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #27ae60;
+            margin-bottom: 30px;
+        }
+        
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .checkmark {
+            font-size: 80px;
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div class="content-container">
-        <h2>All questions are complete!</h2>
-        <p class="complete-message">Thank you for your participation. Your responses have been recorded.</p>
+    <div class="completion-container">
+        <div class="checkmark">✓</div>
+        <h1>Evaluation Successfully Completed</h1>
+        <p>Thank you for participating in our study! Your responses have been successfully recorded.</p>
+        <p>You may now close this window.</p>
     </div>
-    <!-- <script>
-        window.onload = function () {
-            const answers = localStorage.getItem("surveyAnswers");
-            if (answers) {
-                const blob = new Blob([answers], { type: "application/json" });
-                const a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = "experiment_results.json";
-                a.click();
-            }
-        };
-    </script> -->
 </body>
 </html>

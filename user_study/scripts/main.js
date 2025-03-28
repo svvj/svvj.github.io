@@ -850,13 +850,6 @@ function showSubmitButton() {
 
 // **답변 제출 및 저장**
 function submitAnswers() {
-    // 테스트 모드인 경우 메인 실험으로 리디렉션
-    if (window.isTestMode) {
-        console.log("Test mode completed, redirecting to main experiment");
-        window.location.href = "experiment_index.html";
-        return;
-    }
-    
     const finalData = {
         participantInfo: participantInfo,
         responses: answers,
@@ -864,36 +857,25 @@ function submitAnswers() {
     };
     
     try {
-        // 로컬 스토리지에 저장
-        localStorage.setItem("surveyAnswers", JSON.stringify(finalData));
+        // 테스트 모드가 아닌 경우에만 데이터 저장
+        if (!window.isTestMode) {
+            localStorage.setItem("surveyAnswers", JSON.stringify(finalData));
+            console.log("Answers saved successfully:", finalData);
+        } else {
+            console.log("Test mode: Answers not saved", finalData);
+        }
         
-        const jsonData = JSON.stringify(finalData, null, 2);
-        const blob = new Blob([jsonData], { type: 'application/json' });
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(blob);
-        
-        // 참가자 정보로 파일명 생성
-        const participantName = finalData.participantInfo.name || 'anonymous';
-        const participantAge = finalData.participantInfo.age || 'unknown';
-        const timestamp = new Date().toISOString()
-            .replace(/[:.]/g, '-')
-            .replace('T', '_')
-            .slice(0, 19);
-        
-        const safeName = participantName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_');
-        downloadLink.download = `survey_${safeName}_${participantAge}_${timestamp}.json`;
-        
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-        console.log("Answers saved successfully:", finalData);
-        
-        // 파일 저장 후 end.html로 리다이렉션 (알림 없음)
-        window.location.href = "end.html";
+        // 테스트 모드인지 확인하고 적절한 페이지로 리디렉션
+        if (window.isTestMode === true) {
+            console.log("Redirecting to test post-survey page");
+            window.location.href = "post_survey_test.html";
+        } else {
+            console.log("Redirecting to real post-survey page");
+            window.location.href = "post_survey.html";
+        }
     } catch (error) {
-        console.error("Error saving answers:", error);
-        alert("There was a problem saving your answers. Please try again.");
+        console.error("Error in submitAnswers:", error);
+        alert("There was a problem with your submission. Please try again.");
     }
 }
 
@@ -1186,7 +1168,24 @@ function loadReferenceImagesWithPreview(referencePaths) {
         // 썸네일 컨테이너 생성
         const thumbnailContainer = document.createElement("div");
         thumbnailContainer.className = "thumbnail-container";
-        
+        function submitAnswers() {
+            const finalData = {
+                participantInfo: participantInfo,
+                responses: answers,
+                completedAt: new Date().toISOString()
+            };
+            
+            try {
+                localStorage.setItem("surveyAnswers", JSON.stringify(finalData));
+                console.log("Answers saved successfully:", finalData);
+                
+                // 종합 설문 페이지로 이동 (테스트 모드인 경우 테스트 버전으로)
+                window.location.href = window.isTestMode ? "post_survey_test.html" : "post_survey.html";
+            } catch (error) {
+                console.error("Error saving answers:", error);
+                alert("There was a problem saving your answers. Please try again.");
+            }
+        }
         // 썸네일 이미지 생성
         const thumbnail = document.createElement("img");
         thumbnail.src = path;
