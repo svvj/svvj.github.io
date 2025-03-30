@@ -329,14 +329,16 @@ body {
 /* 오른쪽 질문 섹션 */
 .question-container {
     flex: 25; /* 더 작게 */
+    position: relateve;
     max-width: 400px;
     padding: 15px;
+    padding-bottom: 70px;
     background-color: #f9f9f9;
     border-radius: 8px;
     border: 1px solid #ddd;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
-    min-height: 400px;
+    min-height: 350px;
 }
 
 /* Likert 스케일 스타일 */
@@ -357,13 +359,23 @@ body {
     padding: 0 5px;
 }
 
+/* 커스텀 라디오 버튼 - 둥근 모서리 사각형 */
 .likert-label {
-    font-size: 14px;
-    max-width: 45%;
-    line-height: 1.3;
-    color: #333;
-    white-space: nowrap;
-    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 36px;
+    border-radius: 8px; /* 둥근 모서리 사각형 */
+    background-color: #f1f1f1;
+    border: 2px solid #ddd;
+    color: #666;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 5px;
+    text-align: center;
 }
 
 .likert-label.left {
@@ -492,17 +504,11 @@ body {
     cursor: pointer;
 }
 
-/* 숫자 레이블 */
-.likert-number {
-    margin-top: 5px;
-    font-size: 14px;
-    color: #666;
-}
-
-/* 선택된 라디오 버튼 강조 */
-.likert-radio:checked + .likert-number {
-    font-weight: bold;
-    color: #4CAF50;
+/* 호버 효과 */
+.likert-radio + .likert-label:hover {
+    background-color: #e3e3e3;
+    border-color: #aaa;
+    transform: scale(1.05);
 }
 
 /* 버튼 스타일 */
@@ -530,9 +536,9 @@ button:hover {
 
 /* 질문 하나씩 보이도록 수정 */
 .question {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eaeaea;
+    position: relative;
+    min-height: 250px; /* 400px에서 250px로 감소 */
+    padding-bottom: 60px; /* 70px에서 60px로 감소 */
 }
 
 .question.active {
@@ -544,6 +550,89 @@ button:hover {
     margin-bottom: 8px;
     font-size: 15px;
     color: #333;
+}
+
+/* 버튼 영역을 고정 위치로 설정 */
+.button-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 0;
+    border-top: 1px solid #eee; /* 경계선 추가 */
+    z-index: 10; /* 내용 위에 표시 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 버튼 스타일 일관되게 통일 */
+.button-container button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    min-width: 100px;
+    transition: all 0.2s;
+}
+
+/* Primary 버튼 (Next) */
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+/* Secondary 버튼 (Previous) */
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Previous 버튼 */
+.button-container .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+.button-container .btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Next 버튼 */
+.button-container .btn-primary {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.button-container .btn-primary:hover {
+    background-color: #45a049;
+}
+
+/* 버튼 컨테이너 내부 영역 설정 */
+.button-left-area, .button-right-area {
+    min-width: 110px; /* 버튼 영역 최소 너비 */
+    display: flex;
+    align-items: center;
+}
+
+.button-left-area {
+    justify-content: flex-start;
+}
+
+.button-right-area {
+    justify-content: flex-end;
 }
 
 label {
@@ -709,14 +798,14 @@ h2, h3 {
     color: #666;
 }
 
-/* 라이커트 스케일 전체 컨테이너 */
+/* 라이커트 컨테이너의 하단 마진 감소 */
 .likert-container {
     width: 100%;
-    margin: 20px 0;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
+    max-width: 100%;
+    margin: 15px 0 10px 0; /* 하단 마진 감소 */
+    padding: 0 10px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* 레이블 행 - 최상단에 위치 */
@@ -796,28 +885,30 @@ h2, h3 {
     flex-direction: column;
 }
 
-/* 라디오 버튼 그룹 - 옵션을 가로로 배열 */
+/* 라디오 버튼 그룹 */
 .likert-radio-group {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-bottom: 20px;
+    margin: 10px 0;
 }
 
-/* 개별 라디오 버튼 옵션 */
+/* 개별 버튼 옵션 */
 .likert-option {
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative;
+    flex: 1;
+    max-width: 60px; /* 최대 너비 제한 */
+    margin: 0 2px; /* 약간의 간격 */
 }
 
-/* 라디오 버튼 스타일 */
+/* 숨겨진 실제 라디오 버튼 */
 .likert-radio {
-    margin: 0;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
 /* 라디오 버튼 숫자 레이블 */
@@ -828,33 +919,50 @@ h2, h3 {
     cursor: pointer;
 }
 
+/* 선택된 상태 */
+.likert-radio:checked + .likert-label {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 /* 선택된 라디오 버튼의 레이블 스타일 */
 .likert-radio:checked + .likert-number {
     font-weight: bold;
     color: #4CAF50;
 }
 
-/* 레이블 그룹 - 양끝에 레이블 배치 */
+/* 포커스 상태 - 접근성 */
+.likert-radio:focus + .likert-label {
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+}
+
+/* 라이커트 레이블 그룹의 마진 조정 */
 .likert-label-group {
     display: flex;
     justify-content: space-between;
     width: 100%;
+    margin-top: 8px; /* 10px에서 8px로 감소 */
+    padding: 0 5px;
+    box-sizing: border-box;
 }
 
-/* 레이블 텍스트 스타일 */
+/* 레이블 엔드포인트 스타일 */
 .likert-endpoint {
     font-size: 14px;
     font-weight: bold;
     color: #333;
     max-width: 45%;
+    line-height: 1.3;
 }
 
-/* 왼쪽 레이블 정렬 */
+/* 레이블 텍스트가 화면 밖으로 나가지 않도록 */
 .likert-endpoint.left {
     text-align: left;
 }
 
-/* 오른쪽 레이블 정렬 */
 .likert-endpoint.right {
     text-align: right;
 }

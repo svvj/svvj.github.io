@@ -114,7 +114,7 @@ function generateQuestions() {
             question: "How satisfied are you with the overall quality of the reconstructed 3D object?",
             required: true,
             type: "likert",
-            scale: 5,
+            scale: 7,
             labels: ["Not Satisfied", "Very Satisfied"],
             imageIndex: imgIndex
         };
@@ -127,7 +127,7 @@ function generateQuestions() {
             question: "How consistent does the reconstructed object appear when compared to the reference view(s)?",
             required: true,
             type: "likert",
-            scale: 5,
+            scale: 7,
             labels: ["Not Consistent", "Very Consistent"],
             imageIndex: imgIndex
         };
@@ -1218,129 +1218,103 @@ function loadReferenceImagesWithPreview(referencePaths) {
 function createLikertQuestion(question, index) {
     // 질문 컨테이너
     const questionElement = document.createElement("div");
-    questionElement.className = "question active"; // active 클래스 추가
+    questionElement.className = "question active";
     questionElement.setAttribute("data-index", index);
 
-    // 질문 제목 (필수 표시 추가)
+    // 질문 제목
     const title = document.createElement("h2");
     title.innerHTML = `${question.question || question.text} 
                       ${question.required ? "<span style='color:red;'>*</span>" : ""}`;
+    title.style.marginBottom = "15px"; // 타이틀 아래 마진 줄임
     questionElement.appendChild(title);
 
-    // 테이블로 라이커트 스케일 생성 (확실한 배치를 위함)
-    const table = document.createElement("table");
-    table.className = "likert-table";
-    table.style.width = "100%";
-    table.style.borderCollapse = "collapse";
-    table.style.tableLayout = "fixed"; // 고정 너비 레이아웃 적용
-    table.style.marginTop = "15px";
-    table.style.marginBottom = "15px";
+    // 라이커트 컨테이너
+    const likertContainer = document.createElement("div");
+    likertContainer.className = "likert-container";
 
-    // 라디오 버튼 행
-    const radioRow = document.createElement("tr");
+    // 라디오 버튼 그룹 생성
+    const radioGroup = document.createElement("div");
+    radioGroup.className = "likert-radio-group";
     
-    // 숫자 행
-    const numberRow = document.createElement("tr");
+    const scale = question.scale || 7;
     
-    // 1-7까지 라디오 버튼 생성 (모두 동일한 너비)
-    for (let i = 1; i <= 5; i++) {
-        const radioCell = document.createElement("td");
-        radioCell.style.textAlign = "center";
-        radioCell.style.width = "20%"; // 7개 열이므로 약 100% ÷ 5
+    // 각 선택지 생성
+    for (let i = 1; i <= scale; i++) {
+        const option = document.createElement("div");
+        option.className = "likert-option";
         
+        // 실제 라디오 버튼 (숨김)
         const radio = document.createElement("input");
         radio.type = "radio";
         radio.name = `q${index}`;
-        radio.value = i;
         radio.id = `q${index}_${i}`;
+        radio.value = i;
+        radio.className = "likert-radio";
+        if (question.required) radio.required = true;
         
-        // required 추가
-        if (question.required) {
-            radio.required = true;
-        }
+        // 커스텀 라벨 (버튼처럼 보이고 숫자 포함)
+        const label = document.createElement("label");
+        label.htmlFor = `q${index}_${i}`;
+        label.className = "likert-label";
+        label.textContent = i;
         
-        radioCell.appendChild(radio);
-        radioRow.appendChild(radioCell);
-        
-        const numberCell = document.createElement("td");
-        numberCell.style.textAlign = "center";
-        numberCell.style.width = "20%"; // 동일한 너비
-        numberCell.textContent = i;
-        numberRow.appendChild(numberCell);
+        option.appendChild(radio);
+        option.appendChild(label);
+        radioGroup.appendChild(option);
     }
 
-    // 레이블 행
-    const labelRow = document.createElement("tr");
+    // 라벨 그룹 생성
+    const labelGroup = document.createElement("div");
+    labelGroup.className = "likert-label-group";
     
-    // 여기서 하드코딩된 레이블 대신 question.labels 사용
     const labels = question.labels || ["Not realistic at all", "Extremely realistic"];
     
     // 왼쪽 레이블
-    const leftCell = document.createElement("td");
-    leftCell.colSpan = "3";
-    leftCell.style.textAlign = "left";
-    // leftCell.style.fontWeight = "bold";
-    leftCell.style.whiteSpace = "nowrap"; // 텍스트 줄바꿈 방지
-    leftCell.style.overflow = "visible"; // 텍스트가 보이도록 설정
-    leftCell.style.paddingRight = "10px"; // 오른쪽 패딩 추가
-    leftCell.style.fontSize = "12px"; // 폰트 크기 줄임
-    leftCell.textContent = labels[0]; // 첫 번째 레이블
-    
-    // 중간 빈 칸
-    const middleCell = document.createElement("td");
-    middleCell.colSpan = "1";
+    const leftLabel = document.createElement("div");
+    leftLabel.className = "likert-endpoint left";
+    leftLabel.textContent = labels[0];
     
     // 오른쪽 레이블
-    const rightCell = document.createElement("td");
-    rightCell.colSpan = "3";
-    rightCell.style.textAlign = "right";
-    rightCell.style.whiteSpace = "nowrap"; // 텍스트 줄바꿈 방지
-    rightCell.style.overflow = "visible"; // 텍스트가 보이도록 설정
-    rightCell.style.paddingLeft = "10px"; // 왼쪽 패딩 추가
-    rightCell.style.fontSize = "12px"; // 폰트 크기 줄임
-    // rightCell.style.fontWeight = "bold";
-    rightCell.textContent = labels[1]; // 두 번째 레이블
+    const rightLabel = document.createElement("div");
+    rightLabel.className = "likert-endpoint right";
+    rightLabel.textContent = labels[1];
+    
+    labelGroup.appendChild(leftLabel);
+    labelGroup.appendChild(rightLabel);
 
-    // 레이블 행에 셀 추가
-    labelRow.appendChild(leftCell);
-    labelRow.appendChild(middleCell);
-    labelRow.appendChild(rightCell);
+    // 라이커트 컨테이너에 요소 추가
+    likertContainer.appendChild(radioGroup);
+    likertContainer.appendChild(labelGroup);
+    questionElement.appendChild(likertContainer);
 
-    // 테이블에 행 추가
-    table.appendChild(radioRow);
-    table.appendChild(numberRow);
-    table.appendChild(labelRow);
-
-    // 전체 요소 조립
-    questionElement.appendChild(table);
-
-    // 버튼 컨테이너 생성 (flex 레이아웃 사용)
+    // 버튼 컨테이너 - 상대적 위치로 변경
     const buttonContainer = document.createElement("div");
-    buttonContainer.style.display = "flex";
-    buttonContainer.style.justifyContent = "space-between"; // 양쪽 정렬
-    buttonContainer.style.marginTop = "20px";
+    buttonContainer.className = "button-container";
     
-    // 왼쪽 영역 (Previous 버튼용)
+    // 왼쪽 버튼 영역
     const leftButtonArea = document.createElement("div");
+    leftButtonArea.className = "button-left-area";
     
-    // 오른쪽 영역 (Next 버튼용)
+    // 오른쪽 버튼 영역
     const rightButtonArea = document.createElement("div");
+    rightButtonArea.className = "button-right-area";
     
     // 이전 버튼 (첫 번째 질문이 아닐 경우에만)
     if (index > 0) {
         const prevButton = document.createElement("button");
         prevButton.textContent = "Previous";
+        prevButton.className = "btn-secondary";
         prevButton.onclick = function() { prevQuestion(); };
         leftButtonArea.appendChild(prevButton);
     }
     
-    // 다음 버튼 (항상 오른쪽)
+    // 다음 버튼
     const nextButton = document.createElement("button");
     nextButton.textContent = "Next";
+    nextButton.className = "btn-primary";
     nextButton.onclick = function() { nextQuestion(); };
     rightButtonArea.appendChild(nextButton);
     
-    // 버튼 영역 추가
     buttonContainer.appendChild(leftButtonArea);
     buttonContainer.appendChild(rightButtonArea);
     questionElement.appendChild(buttonContainer);
