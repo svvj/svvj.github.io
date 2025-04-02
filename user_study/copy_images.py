@@ -4,7 +4,8 @@ import shutil
 SOURCE_DIR = 'C:/Users/wjdtm/Desktop/workspace/svvj.github.io/user_study/gs_results'
 DEST_DIR = 'C:/Users/wjdtm/Desktop/workspace/svvj.github.io/user_study/images'
 
-categories = ['bias', 'bias_com', 'even']
+# categories = ['bias', 'bias_com', 'even']
+categories = ['even']
 objects = ['chair', 'drums', 'tape', 'toy']
 directions = ['back', 'front', 'side', 'top']
 
@@ -32,7 +33,7 @@ for category in categories:
                 dir_path = os.path.join(src, direction)
                 folder_list = os.listdir(dir_path)
                 for folder in folder_list:
-                    if folder == 'cfg_args':
+                    if folder == 'cfg_args' or folder == '*.py':
                         continue
                     src_path = os.path.join(dir_path, folder, 'test/ours_30000/renders')
                     dest_path = os.path.join(DEST_DIR, category, object, direction, folder)
