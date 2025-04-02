@@ -17,7 +17,8 @@
                 <option value="female">Female</option>
                 <option value="other">Other</option>
             </select>
-        </label>
+        </label><br>
+        <label>Email: <input type="email" id="participant-email"></label><br>
         <button onclick="startExperiment()">Start Experiment</button>
     </div>
 
@@ -26,8 +27,9 @@
             const name = document.getElementById("participant-name").value;
             const age = document.getElementById("participant-age").value;
             const gender = document.getElementById("participant-gender").value;
+            const email = document.getElementById("participant-email").value;
 
-            if (!name || !age) {
+            if (!name || !age || !gender || !email) {
                 alert("Please fill out all fields before starting.");
                 return;
             }
@@ -37,6 +39,7 @@
                 name: name,
                 age: age,
                 gender: gender,
+                email: email,
                 startTime: new Date().toISOString()
             };
             

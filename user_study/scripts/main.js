@@ -111,7 +111,7 @@ function generateQuestions() {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "How good and clear does the 3D object look compared to the reference images?",
+            question: "How good and clear does the reconstructed 3D object look compared to the reference images?",
             required: true,
             type: "likert",
             scale: 7,
@@ -124,7 +124,7 @@ function generateQuestions() {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "Does the 3D object look like something that could actually exist in the real world?",
+            question: "Does the reconstructed 3D object look like something that could actually exist in the real world?",
             required: true,
             type: "likert",
             scale: 7,
@@ -203,10 +203,38 @@ function initializeExperiment() {
         return;
     }
     
-    updateFrame(); // 첫 번째 이미지 로드
-    updateQuestion(); // 첫 번째 질문 로드
+    // 객체별 프레임 뷰 초기화
+    viewedObjectFrames = new Map();
+    
+    // 저장된 진행 상황이 있는지 확인
+    const hasSavedProgress = restoreSavedProgress();
+    
+    if (hasSavedProgress) {
+        const confirmRestore = confirm("We found a saved progress. Would you like to continue from where you left off?");
+        
+        if (confirmRestore) {
+            // 저장된 상태로 계속 진행
+            updateQuestion(); // 현재 질문 업데이트
+            updateFrame(); // 이미지 업데이트
+        } else {
+            // 새로 시작 (저장된 상태 삭제)
+            localStorage.removeItem("surveyProgress");
+            currentQuestionIndex = 0;
+            answers = {};
+            updateQuestion();
+            updateFrame();
+        }
+    } else {
+        // 새로 시작
+        updateFrame(); // 첫 번째 이미지 로드
+        updateQuestion(); // 첫 번째 질문 로드
+    }
+    
     startTime = Date.now(); // 시간 측정 시작
-    preloadImagesForCurrentQuestion(); // 첫 번째 질문 이미지 프리로드
+    preloadImagesForCurrentQuestion(); // 현재 질문 이미지 프리로드
+    
+    // 자동 저장 시작 (10초 간격)
+    startAutoSave(10);
 }
 
 // **현재 질문 업데이트 함수** - 이전 답변 복원 로직 추가
@@ -217,6 +245,9 @@ function updateQuestion() {
         console.error("Question container not found");
         return;
     }
+
+    // 질문 변경 시 프레임 뷰 카운터 초기화
+    resetViewedFrames();
 
     // 질문 컨테이너 초기화
     questionContainer.innerHTML = "";
@@ -259,6 +290,12 @@ function updateQuestion() {
     
     // 진행률 표시 업데이트
     updateProgressBar();
+    
+    // 다음 버튼 상태 초기화
+    updateNextButtonState();
+    
+    // 라디오 버튼과 체크박스에 이벤트 리스너 추가하여 선택 시 버튼 상태 업데이트
+    addAnswerChangeListeners();
 }
 
 // 질문에 맞는 이미지 및 레퍼런스 업데이트
@@ -283,6 +320,13 @@ function updateProgressBar() {
 
 // **현재 이미지 업데이트** - 레퍼런스 이미지 로드 추가
 // Modify the updateFrame function to shift frame numbers
+// 이미 본 객체 추적을 위한 맵
+let viewedObjectFrames = new Map(); // object -> Set of frames
+
+// 프레임 확인을 추적하는 변수 추가 (기존 변수 대체)
+const MIN_FRAMES_TO_VIEW = 100; // 최소 확인해야 할 프레임 수
+
+// updateFrame 함수 수정 - 객체별 추적 기능으로 변경
 function updateFrame() {
     const frameSlider = document.getElementById("frame-slider");
     const imageFrame = document.getElementById("image-frame");
@@ -291,8 +335,22 @@ function updateFrame() {
     const sliderValue = parseInt(frameSlider.value);
     const shiftedFrame = (sliderValue + 50) % 200;  // Shift by 50 frames and wrap around at 200
     
+    // 현재 객체 정보 가져오기
+    const questionData = questionList[currentQuestionIndex];
+    const currentObject = questionData.object;
+    
+    // 현재 객체에 대한 프레임 추적 세트 가져오거나 생성
+    if (!viewedObjectFrames.has(currentObject)) {
+        viewedObjectFrames.set(currentObject, new Set());
+    }
+    
+    // 현재 프레임을 해당 객체의 뷰 세트에 추가
+    viewedObjectFrames.get(currentObject).add(sliderValue);
+    
+    // 다음 버튼 상태 업데이트
+    updateNextButtonState();
+    
     // Update current frame display with the slider value (not the shifted value)
-    // This keeps the UI showing 0-199 but internally we're using shifted frames
     const currentFrameDisplay = document.getElementById("current-frame");
     if (currentFrameDisplay) {
         currentFrameDisplay.textContent = `${sliderValue + 1}`;
@@ -304,7 +362,6 @@ function updateFrame() {
     }
 
     // Current question image info
-    const questionData = questionList[currentQuestionIndex];
     const { render, object, num } = questionData;
 
     // Format SHIFTED frame number with leading zeros (00000, 00001, etc.)
@@ -327,6 +384,119 @@ function updateFrame() {
     }
 
     console.log(`Displaying frame: ${sliderValue} (shifted to ${shiftedFrame} - ${frameString}.png)`);
+}
+
+// 각 질문을 위한 확인된 프레임 초기화 함수
+function resetViewedFrames() {
+    viewedFrames = new Set();
+    updateNextButtonState();
+}
+
+// 다음 버튼 상태 업데이트 함수
+function updateNextButtonState() {
+    const nextButtons = document.querySelectorAll(".btn-primary");
+    
+    // 현재 객체와 객체의 프레임 확인 횟수
+    const currentObject = questionList[currentQuestionIndex].object;
+    const framesViewed = viewedObjectFrames.has(currentObject) ? 
+                        viewedObjectFrames.get(currentObject).size : 0;
+    const hasViewedEnoughFrames = framesViewed >= MIN_FRAMES_TO_VIEW;
+    
+    // 현재 질문에 답변했는지 확인
+    const hasAnswered = hasAnsweredQuestion();
+    
+    nextButtons.forEach(button => {
+        if (button.textContent === "Next") {
+            if (hasViewedEnoughFrames && hasAnswered) {
+                // 충분한 프레임을 확인했고 답변했으면 활성화
+                button.disabled = false;
+                button.title = "";
+                button.style.opacity = "1";
+                button.style.cursor = "pointer";
+            } else {
+                // 조건을 충족하지 않으면 비활성화
+                button.disabled = true;
+                
+                if (!hasViewedEnoughFrames && !hasAnswered) {
+                    button.title = `Please view at least ${MIN_FRAMES_TO_VIEW} frames and answer the question before proceeding`;
+                } else if (!hasViewedEnoughFrames) {
+                    button.title = `Please view at least ${MIN_FRAMES_TO_VIEW} frames before proceeding`;
+                } else {
+                    button.title = `Please answer the question before proceeding`;
+                }
+                
+                button.style.opacity = "0.5";
+                button.style.cursor = "not-allowed";
+            }
+        }
+    });
+    
+    // 프레임 진행률 표시 (선택 사항)
+    const progressInfo = document.getElementById("frames-progress");
+    if (progressInfo) {
+        progressInfo.textContent = `Frames viewed: ${framesViewed}/${MIN_FRAMES_TO_VIEW}`;
+    }
+}
+
+// 답변 변경 감지를 위한 이벤트 리스너 추가
+function addAnswerChangeListeners() {
+    const activeQuestion = document.querySelector(".question.active");
+    if (!activeQuestion) return;
+    
+    const questionData = questionList[currentQuestionIndex];
+    
+    switch(questionData.type) {
+        case "likert":
+        case "multiplechoice":
+            // 라디오 버튼에 변경 이벤트 추가
+            const radioButtons = activeQuestion.querySelectorAll(`input[type="radio"]`);
+            radioButtons.forEach(radio => {
+                radio.addEventListener("change", updateNextButtonState);
+            });
+            break;
+            
+        case "checkbox":
+            // 체크박스에 변경 이벤트 추가
+            const checkboxes = activeQuestion.querySelectorAll(`input[type="checkbox"]`);
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener("change", updateNextButtonState);
+            });
+            break;
+    }
+}
+
+// 현재 질문에 답변했는지 확인하는 함수
+function hasAnsweredQuestion() {
+    if (currentQuestionIndex >= questionList.length) {
+        return true;
+    }
+    
+    const questionData = questionList[currentQuestionIndex];
+    const activeQuestion = document.querySelector(".question.active");
+    
+    if (!activeQuestion) return false;
+    
+    switch(questionData.type) {
+        case "likert":
+        case "multiplechoice":
+            // 라디오 버튼 확인
+            const checked = activeQuestion.querySelector(`input[name="q${currentQuestionIndex}"]:checked`);
+            return !!checked;
+            
+        case "checkbox":
+            // 체크박스 확인 - 하나라도 선택되어 있으면 됨
+            let anyChecked = false;
+            questionData.options.forEach((_, optIndex) => {
+                const checkbox = activeQuestion.querySelector(`input[name="q${currentQuestionIndex}_opt${optIndex}"]`);
+                if (checkbox && checkbox.checked) {
+                    anyChecked = true;
+                }
+            });
+            return anyChecked;
+            
+        default:
+            return true;
+    }
 }
 
 // 레퍼런스 이미지 로드 함수
@@ -1220,6 +1390,7 @@ function loadReferenceImagesWithPreview(referencePaths) {
     });
 }
 
+// Likert 질문 생성 함수에서 Previous 버튼 제거
 function createLikertQuestion(question, index) {
     // 질문 컨테이너
     const questionElement = document.createElement("div");
@@ -1248,7 +1419,7 @@ function createLikertQuestion(question, index) {
         const option = document.createElement("div");
         option.className = "likert-option";
         
-        // 실제 라디오 버튼 (숨김)
+        // 실제 라디오 버튼
         const radio = document.createElement("input");
         radio.type = "radio";
         radio.name = `q${index}`;
@@ -1292,28 +1463,21 @@ function createLikertQuestion(question, index) {
     likertContainer.appendChild(labelGroup);
     questionElement.appendChild(likertContainer);
 
-    // 버튼 컨테이너 - 상대적 위치로 변경
+    // 버튼 컨테이너 - Next 버튼만 표시
     const buttonContainer = document.createElement("div");
     buttonContainer.className = "button-container";
     
-    // 왼쪽 버튼 영역
+    // 버튼을 오른쪽에 배치하기 위한 빈 영역
     const leftButtonArea = document.createElement("div");
     leftButtonArea.className = "button-left-area";
     
-    // 오른쪽 버튼 영역
+    // 오른쪽 버튼 영역 (Next 버튼용)
     const rightButtonArea = document.createElement("div");
     rightButtonArea.className = "button-right-area";
     
-    // 이전 버튼 (첫 번째 질문이 아닐 경우에만)
-    if (index > 0) {
-        const prevButton = document.createElement("button");
-        prevButton.textContent = "Previous";
-        prevButton.className = "btn-secondary";
-        prevButton.onclick = function() { prevQuestion(); };
-        leftButtonArea.appendChild(prevButton);
-    }
+    // Previous 버튼은 더 이상 추가하지 않음
     
-    // 다음 버튼
+    // 다음 버튼 (항상 오른쪽에만 배치)
     const nextButton = document.createElement("button");
     nextButton.textContent = "Next";
     nextButton.className = "btn-primary";
@@ -1379,12 +1543,12 @@ function createMultipleChoiceQuestion(question, index) {
     const rightButtonArea = document.createElement("div");
     
     // 이전 버튼 (첫 번째 질문이 아닐 경우에만)
-    if (index > 0) {
-        const prevButton = document.createElement("button");
-        prevButton.textContent = "Previous";
-        prevButton.onclick = function() { prevQuestion(); };
-        leftButtonArea.appendChild(prevButton);
-    }
+    // if (index > 0) {
+    //     const prevButton = document.createElement("button");
+    //     prevButton.textContent = "Previous";
+    //     prevButton.onclick = function() { prevQuestion(); };
+    //     leftButtonArea.appendChild(prevButton);
+    // }
     
     // 다음 버튼 (항상 오른쪽)
     const nextButton = document.createElement("button");
@@ -1575,10 +1739,20 @@ let autoSaveInterval;
 
 // 자동 저장 함수
 function autoSaveAnswers() {
+    // 현재 질문 답변 저장
+    saveCurrentAnswer();
+    
+    // Map과 Set을 JSON으로 저장 가능하게 변환
+    const viewedObjectFramesObj = {};
+    viewedObjectFrames.forEach((frameSet, objectKey) => {
+        viewedObjectFramesObj[objectKey] = Array.from(frameSet);
+    });
+    
     // 현재 답변과 진행 상태 저장
     const currentState = {
         answers: answers,
         currentQuestionIndex: currentQuestionIndex,
+        viewedObjectFrames: viewedObjectFramesObj, // 변환된 객체 저장
         timestamp: new Date().toISOString()
     };
     
@@ -1629,6 +1803,16 @@ function restoreSavedProgress() {
             answers = progress.answers;
             currentQuestionIndex = progress.currentQuestionIndex;
             
+            // 객체별 프레임 뷰 복원 (저장되어 있다면)
+            if (progress.viewedObjectFrames) {
+                viewedObjectFrames = new Map();
+                
+                // JSON에서 변환된 객체를 Map으로 다시 변환
+                Object.entries(progress.viewedObjectFrames).forEach(([key, valueArray]) => {
+                    viewedObjectFrames.set(key, new Set(valueArray));
+                });
+            }
+            
             console.log(`Restored progress: Question ${currentQuestionIndex + 1} of ${questionList.length}`);
             return true;
         }
@@ -1655,6 +1839,9 @@ function initializeExperiment() {
         console.error("No questions generated");
         return;
     }
+    
+    // 객체별 프레임 뷰 초기화
+    viewedObjectFrames = new Map();
     
     // 저장된 진행 상황이 있는지 확인
     const hasSavedProgress = restoreSavedProgress();
@@ -1747,7 +1934,7 @@ document.addEventListener('keydown', function(event) {
     }
     
     // 숫자 키 1~5: 라이커트 척도 빠른 선택
-    if (['1', '2', '3', '4', '5'].includes(event.key)) {
+    if (['1', '2', '3', '4', '5', '6', '7'].includes(event.key)) {
         const activeQuestion = document.querySelector('.question.active');
         if (activeQuestion) {
             const radioButton = activeQuestion.querySelector(`input[value="${event.key}"]`);
