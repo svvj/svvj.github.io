@@ -153,24 +153,24 @@
         <h1>Overall Evaluation Questions</h1>
         <p>Thank you for completing the individual assessments. Now we'd like to ask a few questions about your overall experience with all the images you've evaluated.</p>
         
-        <!-- Influence Factors Question -->
+        <!-- Influence Factors Question - Changed to checkboxes -->
         <div class="question-box">
-            <h2>Which of the following factors most influenced your evaluation of the 3D reconstruction quality? <span class="required-label">*</span></h2>
+            <h2>Which of the following factors influenced your evaluation of the 3D reconstruction quality? Choose multiple answers. <span class="required-label">*</span></h2>
             <div class="options-container">
                 <div class="option">
-                    <input type="radio" id="factor2" name="influence_factors" value="geometry">
+                    <input type="checkbox" id="factor2" name="influence_factors[]" value="geometry">
                     <label for="factor2">Geometry and shapes</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="factor3" name="influence_factors" value="texture">
+                    <input type="checkbox" id="factor3" name="influence_factors[]" value="texture">
                     <label for="factor3">Texture quality</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="factor5" name="influence_factors" value="consistency">
+                    <input type="checkbox" id="factor5" name="influence_factors[]" value="consistency">
                     <label for="factor5">Consistency across different frames</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="factor6" name="influence_factors" value="other">
+                    <input type="checkbox" id="factor6" name="influence_factors[]" value="other">
                     <label for="factor6">Other (please specify):</label>
                 </div>
                 <div class="textarea-container" id="other_factors_container" style="display: none;">
@@ -178,37 +178,37 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Artifacts Question -->
+
+        <!-- Artifacts Question - Changed to checkboxes -->
         <div class="question-box">
-            <h2>Which of the following artifact types had the most impact on your evaluation? <span class="required-label">*</span></h2>
+            <h2>Which of the following artifact types had impact on your evaluation? Choose multiple answers. <span class="required-label">*</span></h2>
             <div class="options-container">
                 <div class="option">
-                    <input type="radio" id="artifact1" name="artifacts" value="blurriness">
+                    <input type="checkbox" id="artifact1" name="artifacts[]" value="blurriness">
                     <label for="artifact1">Blurriness or lack of detail</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="artifact2" name="artifacts" value="flickering">
+                    <input type="checkbox" id="artifact2" name="artifacts[]" value="flickering">
                     <label for="artifact2">Flickering or popping</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="artifact3" name="artifacts" value="floating">
+                    <input type="checkbox" id="artifact3" name="artifacts[]" value="floating">
                     <label for="artifact3">Floating points or particles</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="artifact4" name="artifacts" value="missing">
+                    <input type="checkbox" id="artifact4" name="artifacts[]" value="missing">
                     <label for="artifact4">Missing parts or holes</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="artifact5" name="artifacts" value="distortion">
+                    <input type="checkbox" id="artifact5" name="artifacts[]" value="distortion">
                     <label for="artifact5">Shape distortion</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="artifact6" name="artifacts" value="discoloration">
+                    <input type="checkbox" id="artifact6" name="artifacts[]" value="discoloration">
                     <label for="artifact6">Color inconsistencies or discoloration</label>
                 </div>
                 <div class="option">
-                    <input type="radio" id="artifact7" name="artifacts" value="other">
+                    <input type="checkbox" id="artifact7" name="artifacts[]" value="other">
                     <label for="artifact7">Other (please specify):</label>
                 </div>
                 <div class="textarea-container" id="other_artifacts_container" style="display: none;">
@@ -217,6 +217,128 @@
             </div>
         </div>
         
+        <!-- Question about camera trajectory - Added comment field -->
+        <div class="question-box">
+            <h2>Was the camera trajectory sufficient to view the entire object? <span class="required-label">*</span></h2>
+            <div class="options-container">
+                <div class="option">
+                    <input type="radio" id="camera_trajectory1" name="camera_trajectory" value="1">
+                    <label for="camera_trajectory1">1 - Not sufficient</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="camera_trajectory2" name="camera_trajectory" value="2">
+                    <label for="camera_trajectory2">2 - Slightly sufficient</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="camera_trajectory3" name="camera_trajectory" value="3">
+                    <label for="camera_trajectory3">3 - Moderately sufficient</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="camera_trajectory4" name="camera_trajectory" value="4">
+                    <label for="camera_trajectory4">4 - Mostly sufficient</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="camera_trajectory5" name="camera_trajectory" value="5">
+                    <label for="camera_trajectory5">5 - Very sufficient</label>
+                </div>
+                <div class="textarea-container">
+                    <textarea id="camera_trajectory_comment" placeholder="Optional: Add any additional comments about the camera trajectory..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 제공된 reference image들은 오브젝트의 형태를 알아보기에 충분했나요 -->
+        <div class="question-box">
+            <h2>Were the provided reference images sufficient to understand the object's shape? <span class="required-label">*</span></h2>
+            <div class="options-container">
+                <div class="option">
+                    <input type="radio" id="reference_sufficiency1" name="reference_sufficiency" value="1">
+                    <label for="reference_sufficiency1">1 - Not sufficient</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="reference_sufficiency2" name="reference_sufficiency" value="2">
+                    <label for="reference_sufficiency2">2 - Slightly sufficient</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="reference_sufficiency3" name="reference_sufficiency" value="3">
+                    <label for="reference_sufficiency3">3 - Moderately sufficient</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="reference_sufficiency4" name="reference_sufficiency" value="4">
+                    <label for="reference_sufficiency4">4 - Mostly sufficient</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="reference_sufficiency5" name="reference_sufficiency" value="5">
+                    <label for="reference_sufficiency5">5 - Very sufficient</label>
+                </div>
+                <div class="textarea-container">
+                    <textarea id="reference_sufficiency_comment" placeholder="Optional: Add any additional comments about the reference images..."></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 사전에 연습한 실험의 경험은 본 실험을 진행하는데 충분했나요? -->
+        <!-- Practice session question - Added comment field and fixed duplicate IDs -->
+        <div class="question-box">
+            <h2>Was the practice session sufficient to prepare you for the actual experiment? <span class="required-label">*</span></h2>
+            <div class="options-container">
+                <div class="option">
+                    <input type="radio" id="practice_sufficiency1" name="practice_sufficiency" value="1">
+                    <label for="practice_sufficiency1">1 - Not sufficient</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="practice_sufficiency2" name="practice_sufficiency" value="2">
+                    <label for="practice_sufficiency2">2 - Slightly satisfied</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="practice_sufficiency3" name="practice_sufficiency" value="3">
+                    <label for="practice_sufficiency3">3 - Moderately satisfied</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="practice_sufficiency4" name="practice_sufficiency" value="4">
+                    <label for="practice_sufficiency4">4 - Mostly satisfied</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="practice_sufficiency5" name="practice_sufficiency" value="5">
+                    <label for="practice_sufficiency5">5 - Very satisfied</label>
+                </div>
+                <div class="textarea-container">
+                    <textarea id="practice_sufficiency_comment" placeholder="Optional: Add any additional comments about the practice session..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- UI 만족도 평가 -->
+        <!-- UI satisfaction question - Added comment field -->
+        <div class="question-box">
+            <h2>How satisfied were you with the user interface of the experiment? <span class="required-label">*</span></h2>
+            <div class="options-container">
+                <div class="option">
+                    <input type="radio" id="ui_satisfaction1" name="ui_satisfaction" value="1">
+                    <label for="ui_satisfaction1">1 - Not satisfied</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="ui_satisfaction2" name="ui_satisfaction" value="2">
+                    <label for="ui_satisfaction2">2 - Slightly satisfied</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="ui_satisfaction3" name="ui_satisfaction" value="3">
+                    <label for="ui_satisfaction3">3 - Moderately satisfied</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="ui_satisfaction4" name="ui_satisfaction" value="4">
+                    <label for="ui_satisfaction4">4 - Mostly satisfied</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="ui_satisfaction5" name="ui_satisfaction" value="5">
+                    <label for="ui_satisfaction5">5 - Very satisfied</label>
+                </div>
+                <div class="textarea-container">
+                    <textarea id="ui_satisfaction_comment" placeholder="Optional: Add any additional comments about the user interface..."></textarea>
+                </div>
+            </div>
+        </div>
+
         <!-- Additional Comments -->
         <div class="question-box">
             <h2>Do you have any additional comments or observations about the 3D reconstructions?</h2>
@@ -262,36 +384,95 @@
                 this.checked ? "block" : "none";
         });
         
+        // Update for checkbox handling
+        document.querySelector('input[id="factor6"]').addEventListener("change", function() {
+            document.getElementById("other_factors_container").style.display = 
+                this.checked ? "block" : "none";
+        });
+
+        document.getElementById("artifact7").addEventListener("change", function() {
+            document.getElementById("other_artifacts_container").style.display = 
+                this.checked ? "block" : "none";
+        });
+
         function submitFinalSurvey() {
-            // 필수 항목 검증
-            const influenceFactor = document.querySelector('input[name="influence_factors"]:checked');
-            const artifacts = document.querySelector('input[name="artifacts"]:checked');
+            // Collect checkboxes for influence factors
+            const influenceFactors = Array.from(
+                document.querySelectorAll('input[name="influence_factors[]"]:checked')
+            ).map(input => input.value);
             
-            if (!influenceFactor) {
-                alert("Please select one factor that most influenced your evaluation.");
+            // Collect checkboxes for artifacts
+            const artifactTypes = Array.from(
+                document.querySelectorAll('input[name="artifacts[]"]:checked')
+            ).map(input => input.value);
+            
+            // Validation
+            if (influenceFactors.length === 0) {
+                alert("Please select at least one factor that influenced your evaluation.");
                 return;
             }
             
-            if (!artifacts) {
-                alert("Please select an artifact type that had the most impact.");
+            if (artifactTypes.length === 0) {
+                alert("Please select at least one artifact type that had impact.");
+                return;
+            }
+            
+            // Additional validations for required radio buttons
+            if (!document.querySelector('input[name="camera_trajectory"]:checked')) {
+                alert("Please answer the question about camera trajectory.");
+                return;
+            }
+            
+            if (!document.querySelector('input[name="reference_sufficiency"]:checked')) {
+                alert("Please answer the question about reference images.");
+                return;
+            }
+            
+            if (!document.querySelector('input[name="practice_sufficiency"]:checked')) {
+                alert("Please answer the question about practice session.");
+                return;
+            }
+            
+            if (!document.querySelector('input[name="ui_satisfaction"]:checked')) {
+                alert("Please answer the question about UI satisfaction.");
                 return;
             }
             
             try {
-                // 응답 수집
-                const factorValue = influenceFactor.value;
-                const otherFactorsText = factorValue === 'other' ? document.getElementById("other_factors").value : '';
-                const artifactValue = artifacts.value;
-                const otherArtifactsText = artifactValue === 'other' ? document.getElementById("other_artifacts").value : '';
+                // Get other form values
+                const otherFactorsText = document.getElementById("other_factors").value;
+                const otherArtifactsText = document.getElementById("other_artifacts").value;
                 const additionalComments = document.getElementById("additional_comments").value;
                 const experimentFeedback = document.getElementById("experiment_feedback").value;
                 
-                // 최종 응답 생성
+                // Collect all optional comment fields
+                const cameraTrajectoryComment = document.getElementById("camera_trajectory_comment").value;
+                const referenceComment = document.getElementById("reference_sufficiency_comment").value;
+                const practiceComment = document.getElementById("practice_sufficiency_comment").value;
+                const uiComment = document.getElementById("ui_satisfaction_comment").value;
+                
+                // Create final survey data
                 const finalSurveyData = {
-                    mainInfluenceFactor: factorValue,
+                    influenceFactors: influenceFactors,
                     otherFactors: otherFactorsText,
-                    mainArtifact: artifactValue,
+                    artifactTypes: artifactTypes,
                     otherArtifacts: otherArtifactsText,
+                    cameraTrajectory: {
+                        rating: document.querySelector('input[name="camera_trajectory"]:checked').value,
+                        comment: cameraTrajectoryComment
+                    },
+                    referenceImages: {
+                        rating: document.querySelector('input[name="reference_sufficiency"]:checked').value,
+                        comment: referenceComment
+                    },
+                    practiceSession: {
+                        rating: document.querySelector('input[name="practice_sufficiency"]:checked').value,
+                        comment: practiceComment
+                    },
+                    uiSatisfaction: {
+                        rating: document.querySelector('input[name="ui_satisfaction"]:checked').value,
+                        comment: uiComment
+                    },
                     additionalComments: additionalComments,
                     experimentFeedback: experimentFeedback,
                     completedAt: new Date().toISOString()
