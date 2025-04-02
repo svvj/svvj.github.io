@@ -111,11 +111,11 @@ function generateQuestions() {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "How satisfied are you with the overall quality of the reconstructed 3D object?",
+            question: "How good and clear does the 3D object look compared to the reference images?",
             required: true,
             type: "likert",
             scale: 7,
-            labels: ["Not Satisfied", "Very Satisfied"],
+            labels: ["Not good", "Very good"],
             imageIndex: imgIndex
         };
         
@@ -124,11 +124,11 @@ function generateQuestions() {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "How consistent does the reconstructed object appear when compared to the reference view(s)?",
+            question: "Does the 3D object look like something that could actually exist in the real world?",
             required: true,
             type: "likert",
             scale: 7,
-            labels: ["Not Consistent", "Very Consistent"],
+            labels: ["Definitely not", "Definitely yes"],
             imageIndex: imgIndex
         };
         
@@ -282,15 +282,20 @@ function updateProgressBar() {
 }
 
 // **현재 이미지 업데이트** - 레퍼런스 이미지 로드 추가
+// Modify the updateFrame function to shift frame numbers
 function updateFrame() {
     const frameSlider = document.getElementById("frame-slider");
     const imageFrame = document.getElementById("image-frame");
-    const frame = frameSlider.value;
     
-    // Current frame number update
+    // Apply frame shifting to start from front (50) instead of back (0)
+    const sliderValue = parseInt(frameSlider.value);
+    const shiftedFrame = (sliderValue + 50) % 200;  // Shift by 50 frames and wrap around at 200
+    
+    // Update current frame display with the slider value (not the shifted value)
+    // This keeps the UI showing 0-199 but internally we're using shifted frames
     const currentFrameDisplay = document.getElementById("current-frame");
     if (currentFrameDisplay) {
-        currentFrameDisplay.textContent = `${parseInt(frame) + 1}`;
+        currentFrameDisplay.textContent = `${sliderValue + 1}`;
     }
 
     if (!frameSlider || !imageFrame) {
@@ -302,11 +307,11 @@ function updateFrame() {
     const questionData = questionList[currentQuestionIndex];
     const { render, object, num } = questionData;
 
-    // Format frame number with leading zeros (00000, 00001, etc.)
-    const frameString = String(frame).padStart(5, '0');
+    // Format SHIFTED frame number with leading zeros (00000, 00001, etc.)
+    const frameString = String(shiftedFrame).padStart(5, '0');
     
-    // Create cache key and image path
-    const cacheKey = `${render}_${object}_${num}_${frame}`;
+    // Create cache key and image path using the shifted frame
+    const cacheKey = `${render}_${object}_${num}_${shiftedFrame}`;
     const cachedImagePath = imageCache.getFromCache(cacheKey, 'rendering');
 
     if (cachedImagePath) {
@@ -321,7 +326,7 @@ function updateFrame() {
         imageCache.addToCache(cacheKey, imagePath, 'rendering');
     }
 
-    console.log(`Displaying frame: ${frame} (${frameString}.png)`);
+    console.log(`Displaying frame: ${sliderValue} (shifted to ${shiftedFrame} - ${frameString}.png)`);
 }
 
 // 레퍼런스 이미지 로드 함수
