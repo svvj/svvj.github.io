@@ -111,11 +111,11 @@ function generateQuestions() {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "How good and clear does the reconstructed 3D object look compared to the reference images?",
+            question: "Does the reconstructed 3D object look like something that could exist in the real world?",
             required: true,
             type: "likert",
             scale: 7,
-            labels: ["Not good", "Very good"],
+            labels: ["Definitely not", "Definitely yes"],
             imageIndex: imgIndex
         };
         
@@ -124,11 +124,11 @@ function generateQuestions() {
             render: img.render,
             object: img.object,
             num: img.num,
-            question: "Does the reconstructed 3D object look like something that could actually exist in the real world?",
+            question: "How good and clear does the reconstructed 3D object look compared to the reference images?",
             required: true,
             type: "likert",
             scale: 7,
-            labels: ["Definitely not", "Definitely yes"],
+            labels: ["Not good", "Very good"],
             imageIndex: imgIndex
         };
         
@@ -245,9 +245,6 @@ function updateQuestion() {
         console.error("Question container not found");
         return;
     }
-
-    // 질문 변경 시 프레임 뷰 카운터 초기화
-    resetViewedFrames();
 
     // 질문 컨테이너 초기화
     questionContainer.innerHTML = "";
@@ -387,10 +384,10 @@ function updateFrame() {
 }
 
 // 각 질문을 위한 확인된 프레임 초기화 함수
-function resetViewedFrames() {
-    viewedFrames = new Set();
-    updateNextButtonState();
-}
+// function resetViewedFrames() {
+//     viewedFrames = new Set();
+//     updateNextButtonState();
+// }
 
 // 다음 버튼 상태 업데이트 함수
 function updateNextButtonState() {
@@ -405,8 +402,12 @@ function updateNextButtonState() {
     // 현재 질문에 답변했는지 확인
     const hasAnswered = hasAnsweredQuestion();
     
+    console.log(`Object: ${currentObject}, Frames: ${framesViewed}/${MIN_FRAMES_TO_VIEW}, Answered: ${hasAnswered}`);
+    
     nextButtons.forEach(button => {
         if (button.textContent === "Next") {
+            // 변경된 부분: 두 조건을 모두 확인하도록 로직 수정
+            // 충분한 프레임을 확인했고 답변했을 때만 활성화
             if (hasViewedEnoughFrames && hasAnswered) {
                 // 충분한 프레임을 확인했고 답변했으면 활성화
                 button.disabled = false;
@@ -430,12 +431,6 @@ function updateNextButtonState() {
             }
         }
     });
-    
-    // 프레임 진행률 표시 (선택 사항)
-    const progressInfo = document.getElementById("frames-progress");
-    if (progressInfo) {
-        progressInfo.textContent = `Frames viewed: ${framesViewed}/${MIN_FRAMES_TO_VIEW}`;
-    }
 }
 
 // 답변 변경 감지를 위한 이벤트 리스너 추가
@@ -448,10 +443,18 @@ function addAnswerChangeListeners() {
     switch(questionData.type) {
         case "likert":
         case "multiplechoice":
-            // 라디오 버튼에 변경 이벤트 추가
+            // 기존 이벤트 리스너 제거 (중복 방지)
             const radioButtons = activeQuestion.querySelectorAll(`input[type="radio"]`);
             radioButtons.forEach(radio => {
-                radio.addEventListener("change", updateNextButtonState);
+                // 기존 이벤트 리스너 제거
+                radio.removeEventListener("change", updateNextButtonState);
+                
+                // 새로운 이벤트 리스너: 직접 버튼 상태를 업데이트하지 않고 
+                // 별도의 함수를 통해 버튼 상태 확인
+                radio.addEventListener("change", function() {
+                    // 버튼 상태만 업데이트 (프레임 카운트는 변경하지 않음)
+                    updateNextButtonState();
+                });
             });
             break;
             
@@ -459,7 +462,13 @@ function addAnswerChangeListeners() {
             // 체크박스에 변경 이벤트 추가
             const checkboxes = activeQuestion.querySelectorAll(`input[type="checkbox"]`);
             checkboxes.forEach(checkbox => {
-                checkbox.addEventListener("change", updateNextButtonState);
+                // 기존 이벤트 리스너 제거
+                checkbox.removeEventListener("change", updateNextButtonState);
+                
+                // 새 이벤트 리스너 추가
+                checkbox.addEventListener("change", function() {
+                    updateNextButtonState();
+                });
             });
             break;
     }
