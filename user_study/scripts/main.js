@@ -406,10 +406,8 @@ function updateNextButtonState() {
     
     nextButtons.forEach(button => {
         if (button.textContent === "Next") {
-            // 변경된 부분: 두 조건을 모두 확인하도록 로직 수정
-            // 충분한 프레임을 확인했고 답변했을 때만 활성화
+            // 두 조건 모두 만족해야 버튼 활성화
             if (hasViewedEnoughFrames && hasAnswered) {
-                // 충분한 프레임을 확인했고 답변했으면 활성화
                 button.disabled = false;
                 button.title = "";
                 button.style.opacity = "1";
@@ -446,14 +444,14 @@ function addAnswerChangeListeners() {
             // 기존 이벤트 리스너 제거 (중복 방지)
             const radioButtons = activeQuestion.querySelectorAll(`input[type="radio"]`);
             radioButtons.forEach(radio => {
-                // 기존 이벤트 리스너 제거
+                // 기존 이벤트 리스너 모두 제거
                 radio.removeEventListener("change", updateNextButtonState);
                 
-                // 새로운 이벤트 리스너: 직접 버튼 상태를 업데이트하지 않고 
-                // 별도의 함수를 통해 버튼 상태 확인
+                // 새로운 이벤트 리스너: updateNextButtonState 직접 호출하지 않음
                 radio.addEventListener("change", function() {
-                    // 버튼 상태만 업데이트 (프레임 카운트는 변경하지 않음)
-                    updateNextButtonState();
+                    // 직접 버튼 상태를 업데이트하지 않고, updateFrame을 통해 확인
+                    console.log("Radio button changed, checking conditions via updateFrame");
+                    updateFrame(); // 이렇게 하면 프레임 확인 조건도 함께 검사됨
                 });
             });
             break;
@@ -467,7 +465,9 @@ function addAnswerChangeListeners() {
                 
                 // 새 이벤트 리스너 추가
                 checkbox.addEventListener("change", function() {
-                    updateNextButtonState();
+                    // 직접 버튼 상태를 업데이트하지 않고, updateFrame을 통해 확인
+                    console.log("Checkbox changed, checking conditions via updateFrame");
+                    updateFrame(); // 이렇게 하면 프레임 확인 조건도 함께 검사됨
                 });
             });
             break;
