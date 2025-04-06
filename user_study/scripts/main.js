@@ -402,18 +402,17 @@ function updateNextButtonState() {
     // 현재 질문에 답변했는지 확인
     const hasAnswered = hasAnsweredQuestion();
     
-    console.log(`Object: ${currentObject}, Frames: ${framesViewed}/${MIN_FRAMES_TO_VIEW}, Answered: ${hasAnswered}`);
+    console.log(`Object: ${currentObject}, Frames viewed: ${framesViewed}/${MIN_FRAMES_TO_VIEW}, Has answered: ${hasAnswered}, Next button should be: ${hasViewedEnoughFrames && hasAnswered ? 'ENABLED' : 'DISABLED'}`);
     
     nextButtons.forEach(button => {
         if (button.textContent === "Next") {
-            // 두 조건 모두 만족해야 버튼 활성화
             if (hasViewedEnoughFrames && hasAnswered) {
                 button.disabled = false;
                 button.title = "";
                 button.style.opacity = "1";
                 button.style.cursor = "pointer";
+                console.log("Next button ENABLED");
             } else {
-                // 조건을 충족하지 않으면 비활성화
                 button.disabled = true;
                 
                 if (!hasViewedEnoughFrames && !hasAnswered) {
@@ -426,6 +425,7 @@ function updateNextButtonState() {
                 
                 button.style.opacity = "0.5";
                 button.style.cursor = "not-allowed";
+                console.log("Next button DISABLED");
             }
         }
     });
@@ -447,11 +447,11 @@ function addAnswerChangeListeners() {
                 // 기존 이벤트 리스너 모두 제거
                 radio.removeEventListener("change", updateNextButtonState);
                 
-                // 새로운 이벤트 리스너: updateNextButtonState 직접 호출하지 않음
+                // 직접 updateNextButtonState만 호출하고 updateFrame은 호출하지 않음
                 radio.addEventListener("change", function() {
-                    // 직접 버튼 상태를 업데이트하지 않고, updateFrame을 통해 확인
-                    console.log("Radio button changed, checking conditions via updateFrame");
-                    updateFrame(); // 이렇게 하면 프레임 확인 조건도 함께 검사됨
+                    // 답변이 변경되었을 때 버튼 상태만 업데이트
+                    console.log("Radio button changed, checking answer condition");
+                    updateNextButtonState(); // 프레임은 추가하지 않고 버튼 상태만 확인
                 });
             });
             break;
@@ -465,9 +465,9 @@ function addAnswerChangeListeners() {
                 
                 // 새 이벤트 리스너 추가
                 checkbox.addEventListener("change", function() {
-                    // 직접 버튼 상태를 업데이트하지 않고, updateFrame을 통해 확인
-                    console.log("Checkbox changed, checking conditions via updateFrame");
-                    updateFrame(); // 이렇게 하면 프레임 확인 조건도 함께 검사됨
+                    // 답변이 변경되었을 때 버튼 상태만 업데이트
+                    console.log("Checkbox changed, checking answer condition");
+                    updateNextButtonState(); // 프레임은 추가하지 않고 버튼 상태만 확인
                 });
             });
             break;
