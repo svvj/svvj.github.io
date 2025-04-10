@@ -49,6 +49,7 @@ const imageCache = {
 
 // **참가자 정보 불러오기**
 const participantInfo = JSON.parse(localStorage.getItem("participantInfo")) || {};
+const backgroundInfo = JSON.parse(localStorage.getItem("backgroundInfo")) || {};
 
 // **초기화 함수**
 document.addEventListener("DOMContentLoaded", function() {
@@ -397,15 +398,21 @@ function updateNextButtonState() {
     const currentObject = questionList[currentQuestionIndex].object;
     const framesViewed = viewedObjectFrames.has(currentObject) ? 
                         viewedObjectFrames.get(currentObject).size : 0;
+    
+    // 테스트 모드와 실제 모드 모두 동일한 조건 적용
     const hasViewedEnoughFrames = framesViewed >= MIN_FRAMES_TO_VIEW;
     
     // 현재 질문에 답변했는지 확인
     const hasAnswered = hasAnsweredQuestion();
     
-    console.log(`Object: ${currentObject}, Frames viewed: ${framesViewed}/${MIN_FRAMES_TO_VIEW}, Has answered: ${hasAnswered}, Next button should be: ${hasViewedEnoughFrames && hasAnswered ? 'ENABLED' : 'DISABLED'}`);
+    // 디버깅 로그 추가
+    console.log(`Mode: ${window.isTestMode ? "Test" : "Real"}, Object: ${currentObject}, 
+                Frames: ${framesViewed}/${MIN_FRAMES_TO_VIEW}, Answered: ${hasAnswered}`);
     
     nextButtons.forEach(button => {
         if (button.textContent === "Next") {
+            // 두 조건을 모두 확인하도록 로직 수정
+            // 충분한 프레임을 확인했고 답변했을 때만 활성화
             if (hasViewedEnoughFrames && hasAnswered) {
                 button.disabled = false;
                 button.title = "";
@@ -447,11 +454,12 @@ function addAnswerChangeListeners() {
                 // 기존 이벤트 리스너 모두 제거
                 radio.removeEventListener("change", updateNextButtonState);
                 
-                // 직접 updateNextButtonState만 호출하고 updateFrame은 호출하지 않음
+                // 새 이벤트 리스너 추가 - 모든 모드에서 동일하게 동작
                 radio.addEventListener("change", function() {
-                    // 답변이 변경되었을 때 버튼 상태만 업데이트
+                    // 답변이 변경되었을 때 버튼 상태만 업데이트 (프레임 카운트 유지)
                     console.log("Radio button changed, checking answer condition");
-                    updateNextButtonState(); // 프레임은 추가하지 않고 버튼 상태만 확인
+                    // 프레임 조건과 함께 평가하기 위해 updateNextButtonState만 호출
+                    updateNextButtonState(); 
                 });
             });
             break;
@@ -463,17 +471,16 @@ function addAnswerChangeListeners() {
                 // 기존 이벤트 리스너 제거
                 checkbox.removeEventListener("change", updateNextButtonState);
                 
-                // 새 이벤트 리스너 추가
+                // 새 이벤트 리스너 추가 - 모든 모드에서 동일하게 동작
                 checkbox.addEventListener("change", function() {
                     // 답변이 변경되었을 때 버튼 상태만 업데이트
                     console.log("Checkbox changed, checking answer condition");
-                    updateNextButtonState(); // 프레임은 추가하지 않고 버튼 상태만 확인
+                    updateNextButtonState(); 
                 });
             });
             break;
     }
 }
-
 // 현재 질문에 답변했는지 확인하는 함수
 function hasAnsweredQuestion() {
     if (currentQuestionIndex >= questionList.length) {
@@ -1036,6 +1043,7 @@ function showSubmitButton() {
 function submitAnswers() {
     const finalData = {
         participantInfo: participantInfo,
+        backgroundInfo: backgroundInfo,
         responses: answers,
         completedAt: new Date().toISOString()
     };
@@ -1062,8 +1070,6 @@ function submitAnswers() {
         alert("There was a problem with your submission. Please try again.");
     }
 }
-
-// 이미지 캐시 및 프리로딩 관련 기능 추가
 
 // 현재 질문에 필요한 모든 이미지를 프리로드
 function preloadImagesForCurrentQuestion() {
@@ -1352,24 +1358,7 @@ function loadReferenceImagesWithPreview(referencePaths) {
         // 썸네일 컨테이너 생성
         const thumbnailContainer = document.createElement("div");
         thumbnailContainer.className = "thumbnail-container";
-        function submitAnswers() {
-            const finalData = {
-                participantInfo: participantInfo,
-                responses: answers,
-                completedAt: new Date().toISOString()
-            };
-            
-            try {
-                localStorage.setItem("surveyAnswers", JSON.stringify(finalData));
-                console.log("Answers saved successfully:", finalData);
-                
-                // 종합 설문 페이지로 이동 (테스트 모드인 경우 테스트 버전으로)
-                window.location.href = window.isTestMode ? "post_survey_test.html" : "post_survey.html";
-            } catch (error) {
-                console.error("Error saving answers:", error);
-                alert("There was a problem saving your answers. Please try again.");
-            }
-        }
+
         // 썸네일 이미지 생성
         const thumbnail = document.createElement("img");
         thumbnail.src = path;
