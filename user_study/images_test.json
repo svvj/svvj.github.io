@@ -1,6 +1,0 @@
-[
-    { "render": "test", "object": "lego", "num": "1"},
-    { "render": "test", "object": "lego", "num": "2"},
-    { "render": "test", "object": "ship", "num": "1"},
-    { "render": "test", "object": "ship", "num": "2"}
-]
