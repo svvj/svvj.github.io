@@ -147,8 +147,12 @@ body {
 
 /* ---- Author sidebar ------------------------------------------------------- */
 .author__avatar img {
+  width: 190px;
+  height: 190px;
+  max-width: 100%;
+  object-fit: cover;
+  object-position: center top;   /* anchor to the head so the top isn't clipped */
   border-radius: 50%;
-  max-width: 200px;
   border: 3px solid var(--global-bg-color);
   box-shadow: 0 0 0 1px var(--global-border-color), 0 8px 24px rgba(0, 0, 0, 0.10);
 }
