@@ -1,14 +1,15 @@
-# main links
+# The following is the order of the links in the header of the website.
+#
+# Changing the order here will adjust the order and you can also add additional
+# links. Removing a link prevents it from showing in the header, but does not
+# prevent it from being included in the site.
+
 main:
-  # - title: "Quick-Start Guide"
-  #   url: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
-  - title: "About"
-    url: /about/
-  - title: "Tags"
-    url: /tags/
-  - title: "Posts"
+  - title: "Publications"
+    url: /publications/
+
+  - title: "Blog Posts"
     url: /year-archive/
-  - title: "Collections"
-    url: /collection-archive/
-  # - title: "Sitemap"
-  #   url: /sitemap/
+
+  - title: "CV"
+    url: /cv/

@@ -1,0 +1,307 @@
+/* ==========================================================================
+   CUSTOM OVERRIDES — clean, modern, professional academic look
+   Loaded last so it wins over the default theme.
+   ========================================================================== */
+
+/* ---- Fonts ---------------------------------------------------------------- */
+$font-ui:      "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+$font-display: "Newsreader", Georgia, "Times New Roman", serif;
+
+/* ---- Refined palette (light) --------------------------------------------- */
+:root {
+  --accent:            #2457c5;
+  --accent-soft:       rgba(36, 87, 197, 0.10);
+  --global-base-color:        var(--accent);
+  --global-link-color:        #2457c5;
+  --global-link-color-hover:  #163a8c;
+  --global-link-color-visited:#2457c5;
+  --global-text-color:        #24292f;
+  --global-text-color-light:  #6b7280;
+  --global-bg-color:          #ffffff;
+  --global-footer-bg-color:   #f7f8fa;
+  --global-border-color:      #e6e8ec;
+  --global-dark-border-color: #d5d9e0;
+  --global-masthead-link-color:       #24292f;
+  --global-masthead-link-color-hover: #2457c5;
+  --card-bg:           #ffffff;
+  --muted:             #6b7280;
+}
+
+/* ---- Refined palette (dark) ---------------------------------------------- */
+html[data-theme="dark"] {
+  --accent:            #7aa2ff;
+  --accent-soft:       rgba(122, 162, 255, 0.14);
+  --global-base-color:        var(--accent);
+  --global-link-color:        #8fb2ff;
+  --global-link-color-hover:  #b9cdff;
+  --global-link-color-visited:#8fb2ff;
+  --global-text-color:        #e6e8ec;
+  --global-text-color-light:  #9aa3af;
+  --global-bg-color:          #15171c;
+  --global-footer-bg-color:   #1b1e24;
+  --global-border-color:      #2a2e37;
+  --global-dark-border-color: #363b45;
+  --global-masthead-link-color:       #e6e8ec;
+  --global-masthead-link-color-hover: #7aa2ff;
+  --card-bg:           #1b1e24;
+  --muted:             #9aa3af;
+}
+
+/* ---- Base typography ------------------------------------------------------ */
+html { font-size: 17px; }
+
+body {
+  font-family: $font-ui;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.003em;
+}
+
+.page__content {
+  font-size: 1rem;
+  line-height: 1.72;
+
+  p, li { color: var(--global-text-color); }
+
+  h1, h2, h3, h4 {
+    font-family: $font-display;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: var(--global-text-color);
+  }
+
+  /* Section headings from markdown "Title\n======" become <h1> in content.
+     Give them an understated rule so pages read like tidy sections. */
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 2.4rem 0 1rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--global-border-color);
+  }
+  h2 {
+    font-size: 1.32rem;
+    font-weight: 600;
+    margin: 2rem 0 0.8rem;
+  }
+  h3 { font-size: 1.12rem; font-weight: 600; }
+
+  > h1:first-child, > h2:first-child { margin-top: 0.4rem; }
+
+  a { text-decoration: none; border-bottom: 1px solid transparent; transition: color .15s ease, border-color .15s ease; }
+  a:hover { border-bottom-color: currentColor; }
+
+  strong, b { font-weight: 650; color: var(--global-text-color); }
+
+  blockquote {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    color: var(--global-text-color);
+    border-radius: 0 6px 6px 0;
+    font-style: normal;
+  }
+
+  hr { border: 0; border-top: 1px solid var(--global-border-color); margin: 2rem 0; }
+}
+
+/* Page title (the big heading at the top of each page) */
+.page__title {
+  font-family: $font-display;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+.page__title + .page__meta { color: var(--muted); }
+
+/* ---- Masthead / navigation ----------------------------------------------- */
+.masthead {
+  border-bottom: 1px solid var(--global-border-color);
+  background-color: var(--global-bg-color);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: saturate(140%) blur(6px);
+}
+
+.greedy-nav {
+  background: transparent;
+
+  .site-title {
+    font-family: $font-ui;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: 1.15rem;
+  }
+
+  a {
+    color: var(--global-masthead-link-color);
+    font-weight: 500;
+  }
+
+  .visible-links a:before { background: var(--accent); height: 2px; }
+
+  a:hover { color: var(--global-masthead-link-color-hover); }
+
+  button { color: var(--global-masthead-link-color); }
+}
+
+/* ---- Author sidebar ------------------------------------------------------- */
+.author__avatar img {
+  border-radius: 50%;
+  max-width: 200px;
+  border: 3px solid var(--global-bg-color);
+  box-shadow: 0 0 0 1px var(--global-border-color), 0 8px 24px rgba(0, 0, 0, 0.10);
+}
+
+.author__name {
+  font-family: $font-ui;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-size: 1.35rem;
+  margin-top: 0.4rem;
+}
+
+.author__bio {
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+.author__urls-wrapper { font-family: $font-ui; }
+
+.author__urls {
+  border: 1px solid var(--global-border-color);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  background: var(--card-bg);
+
+  &:before, &:after { display: none; }   /* remove default callout triangle */
+
+  li { padding: 0.15rem 0; }
+
+  a {
+    color: var(--global-text-color);
+    text-decoration: none;
+    &:hover { color: var(--accent); }
+  }
+
+  .fa, .fab, .fas, .ai { color: var(--muted); transition: color .15s ease; }
+  a:hover .fa, a:hover .fab, a:hover .fas, a:hover .ai { color: var(--accent); }
+}
+
+/* ---- Publications / archive list ----------------------------------------- */
+.archive__item {
+  padding: 1.6rem 0 1.5rem;
+  border-bottom: 1px solid var(--global-border-color);
+}
+.list__item:last-child .archive__item { border-bottom: 0; }
+
+/* Title — the dominant element of each entry */
+.archive__item-title {
+  font-family: $font-ui;
+  font-weight: 700;
+  font-size: 1.18rem;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  margin-top: 0;
+  margin-bottom: 0.3rem;
+
+  a { color: var(--global-text-color) !important; text-decoration: none;
+      font-weight: 700; border-bottom: 2px solid transparent; }
+  a:hover { color: var(--accent) !important; border-bottom-color: var(--accent); }
+
+  /* The tiny standalone permalink icon (only shown when a post also has an
+     external link) — keep it small and muted without touching the title. */
+  a[rel="permalink"] .fa-link { color: var(--muted); font-size: 0.7rem; }
+}
+
+/* Everything below the title is quieter than the title */
+.archive__item p { font-size: 0.92rem; line-height: 1.6; color: var(--muted); margin: 0.35rem 0; }
+
+/* Venue / year line — quiet uppercase meta directly under the title */
+.archive__item-title + p {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.7rem;
+
+  i { font-style: normal; color: var(--muted); }
+}
+
+.archive__item-excerpt { color: var(--global-text-color); font-size: 0.95rem; }
+
+/* "Recommended citation: …" — de-emphasised reference line */
+.archive__item p:last-of-type,
+.archive__item-excerpt + p { color: var(--muted); }
+
+/* Download links (external URLs) rendered as tidy pill buttons */
+.archive__item p a[href^="http"] {
+  display: inline-block;
+  margin: 0.6rem 0.4rem 0 0;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease;
+
+  &:hover { background: var(--accent); color: #fff; }
+}
+html[data-theme="dark"] .archive__item p a[href^="http"]:hover { color: #15171c; }
+
+/* Category headers ("Conference Papers") on the publications page */
+.page__content > h2 {
+  font-family: $font-ui;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 0;
+  margin: 2.2rem 0 0.2rem;
+}
+.page__content > h2 + hr {
+  margin: 0.4rem 0 0;
+  border-top: 2px solid var(--accent);
+  opacity: 0.5;
+}
+
+/* ---- Blog post list (compact: title + date only) ------------------------- */
+.post-list__item {
+  padding: 0.85rem 0;
+
+  .archive__item-title { font-size: 1.12rem; }
+  .page__meta {
+    margin: 0.25rem 0 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+    .far, .fa { color: var(--muted); margin-right: 0.25rem; }
+  }
+  .post-list__sep { margin: 0 0.15rem; }
+}
+
+/* ---- Buttons -------------------------------------------------------------- */
+.btn--inverse {
+  border: 1px solid var(--global-border-color);
+  color: var(--global-text-color);
+}
+
+/* ---- Footer --------------------------------------------------------------- */
+.page__footer {
+  border-top: 1px solid var(--global-border-color);
+  font-family: $font-ui;
+}
+.page__footer-follow .social-icons a:hover { color: var(--accent); }
+
+/* ---- Nicer content width for reading ------------------------------------- */
+@media (min-width: 80em) {
+  .page { padding-right: 0; }
+}
