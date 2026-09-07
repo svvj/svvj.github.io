@@ -117,10 +117,9 @@ body {
 .masthead {
   border-bottom: 1px solid var(--global-border-color);
   background-color: var(--global-bg-color);
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  backdrop-filter: saturate(140%) blur(6px);
+  /* Intentionally NOT sticky: a sticky bar overlaps the avatar/content
+     on scroll (especially on narrower screens where the profile is in
+     normal flow). Keep it in normal flow so nothing is covered. */
 }
 
 .greedy-nav {
