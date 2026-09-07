@@ -236,29 +236,36 @@ body {
 .archive__item-excerpt { color: var(--global-text-color); font-size: 0.95rem; }
 
 /* "Recommended citation: …" — de-emphasised reference line */
-.archive__item p:last-of-type,
-.archive__item-excerpt + p { color: var(--muted); }
+.archive__item-excerpt + p,
+.pub-citation { color: var(--muted); }
 
-/* Download links (external URLs) rendered as tidy pill buttons */
-.archive__item p a[href^="http"] {
-  display: inline-block;
-  margin: 0.6rem 0.4rem 0 0;
-  padding: 0.3rem 0.8rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border: 1px solid transparent;
-  border-radius: 999px;
-  text-decoration: none;
-  transition: background .15s ease, color .15s ease;
+/* Action links (Paper / Slides / Bibtex / Code) — tidy pills, side by side */
+.pub-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.7rem 0 0;
 
-  &:hover { background: var(--accent); color: #fff; }
+  a {
+    display: inline-block;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background .15s ease, color .15s ease;
+
+    &:hover { background: var(--accent); color: #fff; border-bottom-color: transparent; }
+  }
 }
-html[data-theme="dark"] .archive__item p a[href^="http"]:hover { color: #15171c; }
+html[data-theme="dark"] .pub-links a:hover { color: #15171c; }
 
 /* Category headers ("Conference Papers") on the publications page */
 .page__content > h2 {
